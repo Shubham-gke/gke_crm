@@ -379,11 +379,11 @@ const BUILD_NODE_MODULES = path.join(
   "node_modules"
 )
 
-if (!fs.existsSync(CRM_NODE_MODULES)) {
-  throw new Error(
-    `CRM node_modules not found: ${CRM_NODE_MODULES}`
-  )
-}
+// if (!fs.existsSync(CRM_NODE_MODULES)) {
+//   throw new Error(
+//     `CRM node_modules not found: ${CRM_NODE_MODULES}`
+//   )
+// }
 
 if (fs.existsSync(BUILD_NODE_MODULES)) {
   fs.rmSync(
@@ -395,11 +395,16 @@ if (fs.existsSync(BUILD_NODE_MODULES)) {
   )
 }
 
-fs.symlinkSync(
-  CRM_NODE_MODULES,
-  BUILD_NODE_MODULES,
-  "dir"
-)
+// fs.symlinkSync(
+//   CRM_NODE_MODULES,
+//   BUILD_NODE_MODULES,
+//   "dir"
+// )
+if (fs.existsSync(CRM_NODE_MODULES)) {
+	fs.symlinkSync(CRM_NODE_MODULES, BUILD_NODE_MODULES, "dir")
+} else {
+	execSync("yarn install", { cwd: BUILD_DIR, stdio: "inherit" })
+}
 
 console.log(
   "   node_modules linked."
