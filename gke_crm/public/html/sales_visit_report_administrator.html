@@ -703,10 +703,10 @@
             if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
     
             const data = await response.json();
-            if (data.message !== "Administrator") {
-                showAccessMessage("🔒", "Access Denied", "Cannot be accessed by this user.");
-                return;
-            }
+            // if (data.message !== "Administrator") {
+            //     showAccessMessage("🔒", "Access Denied", "Cannot be accessed by this user.");
+            //     return;
+            // }
     
             if (page) {
                 page.style.display = "block";
