@@ -1,0 +1,7 @@
+{
+  "name": "gke_crm",
+  "private": true,
+  "scripts": {
+    "build": "node gke_crm/gke_crm/frontend/custom-build.js"
+  }
+}
