@@ -1,0 +1,1899 @@
+<style>
+    :root{--erp-primary:#000000;--erp-primary-dark:#000000;--erp-primary-light:#eeeeee;--bg:#f4f5f6;--card:#fff;--border:#d1d8dd;--text:#1a1a1a;--muted:#6b6b6b;--success:#1a1a1a;--success-bg:#eeeeee;--warning:#1a1a1a;--warning-bg:#f2f2f2;--danger:#000000;--danger-bg:#eaeaea;--radius:6px}
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif}
+    body{background:var(--bg);color:var(--text);padding-bottom:60px;-webkit-font-smoothing:antialiased}
+    .page{display:none;max-width:1400px;margin:20px auto;padding:0 24px}
+    .page.active{display:block}
+    .card{background:var(--card);border-radius:var(--radius);margin-bottom:18px;box-shadow:0 1px 3px rgba(0,0,0,.06);overflow:hidden;border:1px solid var(--border)}
+    .card-header{background:#000;color:#fff;padding:16px 20px;border-bottom:1px solid var(--border)}
+    .card-header h2{font-size:15.5px;font-weight:700;color:#fff}
+    .card-header .sub{font-size:12px;color:#cfcfcf;margin-top:2px}
+    .section{padding:22px;border-bottom:1px solid #eef0f2}
+    .section:last-child{border-bottom:none}
+    .section-title{font-size:12.5px;font-weight:700;color:var(--erp-primary-dark);text-transform:uppercase;letter-spacing:.5px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+    .section-title::before{content:"";width:3px;height:13px;background:var(--erp-primary);border-radius:2px}
+    .hint{font-size:12px;color:var(--muted);margin-top:-8px;margin-bottom:12px;line-height:1.4}
+    .locked-note{background:var(--warning-bg);color:#1a1a1a;padding:10px 14px;border-radius:6px;font-size:12.5px;font-weight:600;border:1px solid var(--border)}
+    label{display:block;font-size:12.5px;font-weight:600;margin-bottom:6px;color:#333333}
+    input,select,textarea{width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;color:var(--text);background:#fff}
+    input:focus,select:focus,textarea:focus{outline:none;border-color:#000;box-shadow:0 0 0 3px rgba(0,0,0,.12)}
+    button{background:#000;color:#fff;padding:10px 22px;border:none;border-radius:6px;cursor:pointer;font-size:13.5px;font-weight:600}
+    button:hover{background:#222}
+    button.secondary{background:#fff;color:#000;border:1px solid var(--border)}
+    button.secondary:hover{background:#f0f0f0;border-color:#9a9a9a}
+    button.small{padding:6px 12px;font-size:12px}
+    .filter-bar{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;padding:18px 22px;background:#fafbfc;border-bottom:1px solid #eef0f2}
+    .filter-bar .fitem{min-width:170px}
+    .filter-bar label{margin-bottom:5px}
+    .kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px}
+    .kpi{background:#fff;border:1px solid var(--border);border-radius:8px;padding:14px 16px;position:relative;overflow:hidden}
+    .kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:#000}
+    .kpi .val{font-size:22px;font-weight:800;color:var(--text)}
+    .kpi .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:4px}
+    table{width:100%;border-collapse:collapse;font-size:12.5px}
+    table th{background:#f4f5f6;color:var(--text);font-weight:700;text-align:left;padding:9px 12px;border-bottom:1px solid var(--border);position:sticky;top:0}
+    table td{border-bottom:1px solid #eef0f2;padding:9px 12px;color:var(--text)}
+    table tr:hover td{background:#f7f7f7}
+    .table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:8px}
+    .empty-state{padding:36px 20px;text-align:center;color:var(--muted);font-size:13px}
+    .fu-scroll{max-height:320px;overflow-y:auto}
+    .link-action{color:#000;font-weight:700;cursor:pointer;white-space:nowrap;text-decoration:underline}
+    .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.3px;border:1px solid #c9c9c9}
+    .badge.pending{background:#f2f2f2;color:#333}
+    .badge.approved{background:#000;color:#fff;border-color:#000}
+    .badge.rejected{background:#fff;color:#000;border-color:#000}
+    .badge.direct{background:#eeeeee;color:#1a1a1a}
+    .badge.upcoming{background:#fff;color:#000;border-color:#000}
+    @media(max-width:1100px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:640px){.kpi-grid{grid-template-columns:1fr 1fr}}
+    </style>
+    
+    <script>
+    function loadVisitTypes() {
+        fetch("/api/method/get_visit_type", { method: "GET", headers: { "Content-Type": "application/json" } })
+            .then(r => { if (!r.ok) throw new Error("Failed to load Visit Types"); return r.json(); })
+            .then(data => {
+                const select = document.getElementById("reportVisitType");
+                select.innerHTML = `<option value="">All</option>`;
+                (data.message || []).forEach(item => {
+                    const value = typeof item === "string" ? item : item.name || item.visit_type;
+                    if (!value) return;
+                    const option = document.createElement("option");
+                    option.value = value;
+                    option.textContent = value;
+                    select.appendChild(option);
+                });
+            })
+            .catch(e => console.error("Visit Type API Error:", e));
+    }
+    
+    document.addEventListener("DOMContentLoaded", function () {
+        loadVisitTypes();
+        loadDVRData();
+    });
+    </script>
+    
+    <script>
+    function loadClient() {
+        fetch("/api/method/get_customer_from_gk", { method: "GET", headers: { "Content-Type": "application/json" } })
+            .then(r => { if (!r.ok) throw new Error("Failed to load clients"); return r.json(); })
+            .then(data => {
+                const select = document.getElementById("reportClientFilter");
+                if (!select) return;
+                select.innerHTML = `<option value="">All Clients</option>`;
+                (data.message || []).forEach(item => {
+                    const value = item.name + " - " + item.customer_name;
+                    const option = document.createElement("option");
+                    option.value = value;
+                    option.textContent = value;
+                    select.appendChild(option);
+                });
+            })
+            .catch(e => console.error("Client API Error:", e));
+    }
+    
+    document.addEventListener("DOMContentLoaded", function () {
+        loadClient();
+        loadDVRData();
+    });
+    </script>
+    
+    <script>
+    /* Client name to show: party_name for New Client, client for Existing Client */
+    function getClientName(row) {
+        return row.client_type === "New Client"
+            ? (row.party_name || row.client || "-")
+            : (row.client || row.party_name || "-");
+    }
+    
+    function renderReport() {
+        const employee = document.getElementById("employeeFilter")?.value || "";
+        const visitType = document.getElementById("reportVisitType")?.value || "";
+        const fromDate = document.getElementById("reportFrom")?.value || "";
+        const toDate = document.getElementById("reportTo")?.value || "";
+        const clientType = document.getElementById("reportClientType")?.value || "";
+        const client = document.getElementById("reportClientFilter")?.value || "";
+    
+        let filteredData = [...dvrData];
+    
+        if (employee) filteredData = filteredData.filter(row => row.sales_person === employee);
+        if (visitType) filteredData = filteredData.filter(row => row.visit_type === visitType);
+        if (fromDate) filteredData = filteredData.filter(row => row.visit_date >= fromDate);
+        if (toDate) filteredData = filteredData.filter(row => row.visit_date <= toDate);
+        if (clientType) filteredData = filteredData.filter(row => row.client_type === clientType);
+    
+        if (client) {
+            filteredData = filteredData.filter(row =>
+                row.client === client ||
+                (row.client || "").startsWith(client + " - ") ||
+                row.party_name === client
+            );
+        }
+    
+        const originalData = dvrData;
+        dvrData = filteredData;
+    
+        renderVisitRecords();
+        renderFollowUpReport();
+        updateKPIs();
+    
+        dvrData = originalData;
+    }
+    
+    function clearReportFilters() {
+        const ids = ["employeeFilter", "reportVisitType", "reportFrom", "reportTo", "reportClientType", "reportClientFilter"];
+        ids.forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
+        toggleClientNameFilter();
+        loadDVRData();
+    }
+    
+    function updateKPIs() {
+        const total = dvrData.length;
+        const approved = dvrData.filter(r => r.approval_status === "Approved").length;
+        const pending = dvrData.filter(r => r.approval_status === "Pending").length;
+        const rejected = dvrData.filter(r => r.approval_status === "Rejected").length;
+        const salesGm = dvrData.reduce((sum, r) => sum + (parseFloat(r.sales_gm) || 0), 0);
+    
+        const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+        set("kpiTotal", total);
+        set("kpiApproved", approved);
+        set("kpiPending", pending);
+        set("kpiRejected", rejected);
+        set("kpiSalesGm", salesGm.toFixed(2));
+    }
+    </script>
+    
+    <div class="page" id="reportPage">
+        <div class="card">
+    
+            <div class="card-header">
+                <h2>Sales Person Visit Report</h2>
+                <div class="sub" id="reportSub">Visit performance overview</div>
+            </div>
+    
+            <div class="filter-bar">
+                <div class="fitem">
+                    <label>Visit Type</label>
+                    <select id="reportVisitType" onchange="renderReport()">
+                        <option value="">All</option>
+                    </select>
+                </div>
+    
+                <div class="fitem">
+                    <label>From Date</label>
+                    <input type="date" id="reportFrom" onchange="renderReport()">
+                </div>
+    
+                <div class="fitem">
+                    <label>To Date</label>
+                    <input type="date" id="reportTo" onchange="renderReport()">
+                </div>
+    
+                <div class="fitem">
+                    <label>Client Type</label>
+                    <select id="reportClientType" onchange="toggleClientNameFilter()">
+                        <option value="">All (Existing + New)</option>
+                        <option value="Existing Client">Existing Clients</option>
+                        <option value="New Client">New Clients</option>
+                    </select>
+                </div>
+    
+                <div class="fitem" id="clientNameFilterWrap">
+                    <label id="clientFilterLabel">Client Name</label>
+                    <select id="reportClientFilter" onchange="renderReport()">
+                        <option value="">All Clients</option>
+                    </select>
+                </div>
+    
+                <div class="fitem">
+                    <button class="secondary small" type="button" onclick="clearReportFilters()">Clear Filters</button>
+                </div>
+            </div>
+    
+            <div class="section" id="lockedNoteWrap" style="display:none;">
+                <div class="locked-note">
+                    🔒 You are viewing only your own visit records.
+                    Sales Managers can view data across all executives.
+                </div>
+            </div>
+    
+            <div class="section">
+                <div class="kpi-grid">
+                    <div class="kpi"><div class="val" id="kpiTotal">0</div><div class="lbl">Total Visits</div></div>
+                    <div class="kpi"><div class="val" id="kpiApproved">0</div><div class="lbl">Approved</div></div>
+                    <div class="kpi"><div class="val" id="kpiPending">0</div><div class="lbl">Pending</div></div>
+                    <div class="kpi"><div class="val" id="kpiRejected">0</div><div class="lbl">Rejected</div></div>
+                    <div class="kpi"><div class="val" id="kpiSalesGm">0</div><div class="lbl">Total Expected Sales (gm)</div></div>
+                </div>
+            </div>
+    
+            <!-- FOLLOW-UP (TOP) -->
+            <div class="section">
+                <div class="section-title">Follow-Up Report</div>
+                <div class="hint" style="margin-bottom:12px;">
+                    All visits with a Next Visit Date, ordered by the soonest follow-up first.
+                </div>
+                <div class="table-wrap fu-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Next Visit Date</th>
+                                <th>Client</th>
+                                <th>Client Type</th>
+                                <th>Executive</th>
+                                <th>Branch</th>
+                                <th>Priority</th>
+                                <th>Note</th>
+                                <th>Approval Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="followUpList"></tbody>
+                    </table>
+                </div>
+                <div class="empty-state" id="followUpEmpty" style="display:none;">
+                    No upcoming follow-ups scheduled.
+                </div>
+            </div>
+    
+            <!-- VISIT RECORDS (BELOW) -->
+            <div class="section">
+                <div class="section-title">Visit Records</div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Executive</th>
+                                <th>Branch</th>
+                                <th>Client</th>
+                                <th>Client Type</th>
+                                <th>Visit Type</th>
+                                <th>Purpose</th>
+                                <th>Status</th>
+                                <th>Sales (gm)</th>
+                                <th>Approval Status</th>
+                                <th>Next Visit</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportTable"></tbody>
+                    </table>
+                </div>
+                <div class="empty-state" id="reportEmpty" style="display:none;">
+                    No visit records match the selected filters.
+                </div>
+            </div>
+    
+        </div>
+    </div>
+    
+    <script>
+    function toggleClientNameFilter() {
+        const clientType = document.getElementById("reportClientType")?.value || "";
+        const wrap = document.getElementById("clientNameFilterWrap");
+        const select = document.getElementById("reportClientFilter");
+        const label = document.getElementById("clientFilterLabel");
+    
+        if (!wrap || !select) return;
+    
+        if (clientType === "Existing Client") {
+            wrap.style.display = "";
+            if (label) label.textContent = "Client Name";
+            select.innerHTML = `<option value="">All Clients</option>`;
+    
+            fetch("/api/method/get_customer_from_gk", {
+                method: "GET", credentials: "include", headers: { "Accept": "application/json" }
+            })
+                .then(r => { if (!r.ok) throw new Error(`HTTP Error: ${r.status}`); return r.json(); })
+                .then(data => {
+                    const rows = data.message || [];
+                    if (!Array.isArray(rows)) return;
+                    rows.forEach(row => {
+                        if (!row.name) return;
+                        const option = document.createElement("option");
+                        option.value = row.name;
+                        option.textContent = `${row.name} - ${row.customer_name || ""}`;
+                        select.appendChild(option);
+                    });
+                })
+                .catch(e => console.error("Existing Customer API Error:", e));
+    
+        } else if (clientType === "New Client") {
+            wrap.style.display = "";
+            if (label) label.textContent = "Party Name";
+            select.innerHTML = `<option value="">All New Clients</option>`;
+    
+            fetch("/api/method/gke_crm.api.dvr.get_new_client_party_names", {
+                method: "GET", credentials: "include", headers: { "Accept": "application/json" }
+            })
+                .then(r => { if (!r.ok) throw new Error(`HTTP Error: ${r.status}`); return r.json(); })
+                .then(data => {
+                    (data.message || []).forEach(row => {
+                        if (!row.party_name) return;
+                        const option = document.createElement("option");
+                        option.value = row.party_name;
+                        option.textContent = row.party_name;
+                        select.appendChild(option);
+                    });
+                })
+                .catch(e => console.error("New Client API Error:", e));
+    
+        } else {
+            wrap.style.display = "none";
+            select.innerHTML = `<option value="">All Clients</option>`;
+            select.value = "";
+        }
+    
+        renderReport();
+    }
+    
+    document.addEventListener("DOMContentLoaded", toggleClientNameFilter);
+    
+    function openDVR(name, clientType) {
+        if (!name) return;
+    
+        if (clientType === "New Client") {
+            window.location.href = `/app/sub-lead/new`;
+        } else {
+            window.location.href = `/app/daily-visit-report/new`;
+        }
+    }
+    
+    let dvrData = [];
+    
+    function getStatusBadgeClass(status) {
+        const s = (status || "").toString().toLowerCase();
+        if (s.includes("approve") && !s.includes("pending")) return "approved";
+        if (s.includes("pending")) return "pending";
+        if (s.includes("reject")) return "rejected";
+        return "direct";
+    }
+    
+    function loadDVRData() {
+        fetch("/api/method/gke_crm.api.dvr.get_dvr_for_approval", {
+            method: "GET", headers: { "Content-Type": "application/json" }
+        })
+            .then(r => { if (!r.ok) throw new Error(`HTTP Error: ${r.status}`); return r.json(); })
+            .then(data => {
+                dvrData = data.message || [];
+                renderVisitRecords();
+                renderFollowUpReport();
+                updateKPIs();
+            })
+            .catch(error => {
+                console.error("DVR API Error:", error);
+                dvrData = [];
+                renderVisitRecords();
+                renderFollowUpReport();
+                updateKPIs();
+            });
+    }
+    
+    function renderVisitRecords() {
+        const tbody = document.getElementById("reportTable");
+        const empty = document.getElementById("reportEmpty");
+        if (!tbody) return;
+    
+        tbody.innerHTML = "";
+    
+        if (!dvrData.length) {
+            empty.style.display = "block";
+            return;
+        }
+        empty.style.display = "none";
+    
+        dvrData.forEach(row => {
+            const tr = document.createElement("tr");
+            const approvalBadgeClass = getStatusBadgeClass(row.approval_status);
+            const client = getClientName(row);
+    
+            tr.innerHTML = `
+                <td>${row.visit_date || "-"}</td>
+                <td>${row.sales_person || "-"}</td>
+                <td>${row.branch || "-"}</td>
+                <td>${client}</td>
+                <td>${row.client_type || "-"}</td>
+                <td>${row.visit_type || "-"}</td>
+                <td>${row.purpose || "-"}</td>
+                <td>${row.approval_status || "-"}</td>
+                <td>${row.sales_gm != null ? row.sales_gm : 0}</td>
+                <td>${row.approval_status
+                    ? `<span class="badge ${approvalBadgeClass}">${row.approval_status}</span>`
+                    : "-"}</td>
+                <td>${row.next_visit_date || "-"}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+    
+    function renderFollowUpReport() {
+        const tbody = document.getElementById("followUpList");
+        const empty = document.getElementById("followUpEmpty");
+        if (!tbody) return;
+    
+        tbody.innerHTML = "";
+    
+        const followUps = dvrData.filter(row => row.next_visit_date);
+        followUps.sort((a, b) => new Date(a.next_visit_date) - new Date(b.next_visit_date));
+    
+        if (!followUps.length) {
+            empty.style.display = "block";
+            return;
+        }
+        empty.style.display = "none";
+    
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+    
+        followUps.forEach(row => {
+            const tr = document.createElement("tr");
+            const isUpcoming = new Date(row.next_visit_date) >= today;
+            const statusClass = getStatusBadgeClass(row.approval_status);
+            const note = row.next_visit_note || row.remarks || row.purpose || "-";
+            const client = getClientName(row);
+    
+            tr.innerHTML = `
+                <td>${row.next_visit_date || "-"} ${isUpcoming ? '<span class="badge upcoming">Upcoming</span>' : ""}</td>
+                <td>${client}</td>
+                <td>${row.client_type || "-"}</td>
+                <td>${row.sales_person || "-"}</td>
+                <td>${row.branch || "-"}</td>
+                <td>${row.priority || "-"}</td>
+                <td>${note}</td>
+                <td>${row.approval_status ? `<span class="badge ${statusClass}">${row.approval_status}</span>` : "-"}</td>
+                <td><span class="link-action" onclick="openDVR('${row.name}', '${row.client_type || ""}')">Click To follow-up →</span></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+    </script>
+    
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const page = document.getElementById("reportPage");
+        if (page) page.classList.add("active");
+    });
+    </script>
+
+
+<!-- <style>
+    :root {
+        --erp-primary: #2490ef;
+        --erp-primary-dark: #1a73c7;
+        --erp-primary-light: #e8f3fd;
+        --bg: #f4f5f6;
+        --card: #ffffff;
+        --border: #d1d8dd;
+        --text: #36414c;
+        --muted: #8d99a6;
+        --success: #28a745;
+        --success-bg: #eafaf1;
+        --warning: #c78500;
+        --warning-bg: #fff8e6;
+        --danger: #ff5858;
+        --danger-bg: #ffedec;
+        --radius: 6px;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    }
+
+    body {
+        background: var(--bg);
+        color: var(--text);
+        padding-bottom: 60px;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+        display: none;
+        max-width: 1400px;
+        margin: 20px auto;
+        padding: 0 24px;
+    }
+
+    .page.active {
+        display: block;
+    }
+
+    .card {
+        background: var(--card);
+        border-radius: var(--radius);
+        margin-bottom: 18px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, .06);
+        overflow: hidden;
+        border: 1px solid var(--border);
+    }
+
+    .card-header {
+        background: #ffffff;
+        color: var(--text);
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .card-header h2 {
+        font-size: 15.5px;
+        font-weight: 700;
+        color: var(--text);
+    }
+
+    .card-header .sub {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 2px;
+    }
+
+    .section {
+        padding: 22px;
+        border-bottom: 1px solid #eef0f2;
+    }
+
+    .section:last-child {
+        border-bottom: none;
+    }
+
+    .section-title {
+        font-size: 12.5px;
+        font-weight: 700;
+        color: var(--erp-primary-dark);
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .section-title::before {
+        content: "";
+        width: 3px;
+        height: 13px;
+        background: var(--erp-primary);
+        border-radius: 2px;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+
+    .split-grid {
+        display: grid;
+        grid-template-columns: 1.6fr 1fr;
+        gap: 24px;
+        align-items: start;
+    }
+
+    @media(max-width: 1000px) {
+        .split-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .hint {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: -8px;
+        margin-bottom: 12px;
+        line-height: 1.4;
+    }
+
+    .locked-note {
+        background: var(--warning-bg);
+        color: var(--warning);
+        padding: 10px 14px;
+        border-radius: 6px;
+        font-size: 12.5px;
+        font-weight: 600;
+    }
+
+    label {
+        display: block;
+        font-size: 12.5px;
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: #4a5a6a;
+    }
+
+    input,
+    select,
+    textarea {
+        width: 100%;
+        padding: 9px 10px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        font-size: 13px;
+        color: var(--text);
+        background: #fff;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+        outline: none;
+        border-color: var(--erp-primary);
+        box-shadow: 0 0 0 3px rgba(36, 144, 239, .12);
+    }
+
+    button {
+        background: var(--erp-primary);
+        color: #fff;
+        padding: 10px 22px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 13.5px;
+        font-weight: 600;
+    }
+
+    button:hover {
+        background: var(--erp-primary-dark);
+    }
+
+    button.secondary {
+        background: #fff;
+        color: var(--erp-primary-dark);
+        border: 1px solid var(--border);
+    }
+
+    button.secondary:hover {
+        background: var(--erp-primary-light);
+        border-color: var(--erp-primary);
+    }
+
+    button.small {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    .filter-bar {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        padding: 18px 22px;
+        background: #fafbfc;
+        border-bottom: 1px solid #eef0f2;
+    }
+
+    .filter-bar .fitem {
+        min-width: 170px;
+    }
+
+    .filter-bar label {
+        margin-bottom: 5px;
+    }
+
+    .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+
+    .kpi {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 14px 16px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .kpi::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: var(--erp-primary);
+    }
+
+    .kpi .val {
+        font-size: 22px;
+        font-weight: 800;
+        color: var(--text);
+    }
+
+    .kpi .lbl {
+        font-size: 11px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: .4px;
+        margin-top: 4px;
+    }
+
+    .bar-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .bar-name {
+        width: 150px;
+        font-size: 12.5px;
+        color: var(--text);
+        flex-shrink: 0;
+    }
+
+    .bar-track {
+        flex: 1;
+        background: #eef1f4;
+        border-radius: 5px;
+        height: 16px;
+        overflow: hidden;
+    }
+
+    .bar-fill {
+        height: 100%;
+        background: var(--erp-primary);
+        border-radius: 5px;
+    }
+
+    .bar-val {
+        width: 36px;
+        text-align: right;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--text);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12.5px;
+    }
+
+    table th {
+        background: #f4f5f6;
+        color: var(--text);
+        font-weight: 700;
+        text-align: left;
+        padding: 9px 12px;
+        border-bottom: 1px solid var(--border);
+        position: sticky;
+        top: 0;
+    }
+
+    table td {
+        border-bottom: 1px solid #eef0f2;
+        padding: 9px 12px;
+        color: var(--text);
+    }
+
+    table tr:hover td {
+        background: #f7f9fb;
+    }
+
+    .table-wrap {
+        overflow-x: auto;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+    }
+
+    .empty-state {
+        padding: 36px 20px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 13px;
+    }
+
+    .followup-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-height: 640px;
+        overflow-y: auto;
+        padding-right: 2px;
+    }
+
+    .followup-item {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: #fff;
+        padding: 12px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .followup-item .fu-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .followup-item .fu-date {
+        font-size: 12.5px;
+        font-weight: 700;
+        color: var(--text);
+    }
+
+    .followup-item .fu-client {
+        font-size: 13.5px;
+        font-weight: 700;
+        color: var(--text);
+    }
+
+    .followup-item .fu-meta {
+        font-size: 11.5px;
+        color: var(--muted);
+    }
+
+    .followup-item .fu-action {
+        font-size: 12.5px;
+        color: var(--text);
+        line-height: 1.4;
+    }
+
+    .followup-item .fu-bottom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-top: 2px;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: .3px;
+    }
+
+    .badge.pending {
+        background: var(--warning-bg);
+        color: var(--warning);
+    }
+
+    .badge.approved {
+        background: var(--success-bg);
+        color: var(--success);
+    }
+
+    .badge.rejected {
+        background: var(--danger-bg);
+        color: var(--danger);
+    }
+
+    .badge.direct {
+        background: var(--erp-primary-light);
+        color: var(--erp-primary-dark);
+    }
+
+    .badge.upcoming {
+        background: var(--success-bg);
+        color: var(--success);
+    }
+
+    @media(max-width:1100px) {
+
+        .grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .kpi-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+    }
+
+    @media(max-width:640px) {
+
+        .grid {
+            grid-template-columns: 1fr;
+        }
+
+        .kpi-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+
+    }
+</style>
+
+<script>
+    function loadVisitTypes() {
+
+        fetch("/api/method/get_visit_type", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Failed to load Visit Types");
+                }
+
+                return response.json();
+            })
+            .then(data => {
+
+                console.log("Visit Type API Response:", data);
+
+                const select = document.getElementById("reportVisitType");
+
+                select.innerHTML = `
+            <option value="">All</option>
+        `;
+
+                const visitTypes = data.message || [];
+
+                visitTypes.forEach(item => {
+                    const value = typeof item === "string"
+                        ? item
+                        : item.name || item.visit_type;
+
+                    if (!value) return;
+
+                    const option = document.createElement("option");
+
+                    option.value = value;
+                    option.textContent = value;
+
+                    select.appendChild(option);
+                });
+
+            })
+            .catch(error => {
+
+                console.error("Visit Type API Error:", error);
+
+            });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        loadVisitTypes();
+        loadDVRData();
+
+    });
+</script>
+
+<script>
+
+    function loadClient() {
+
+        fetch("/api/method/get_customer_from_gk", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+            .then(response => {
+
+                if (!response.ok) {
+                    throw new Error("Failed to load clients");
+                }
+
+                return response.json();
+            })
+            .then(data => {
+
+                console.log("Client API Response:", data);
+
+                const select = document.getElementById("reportClientFilter");
+
+                if (!select) return;
+
+                select.innerHTML = `
+            <option value="">All Clients</option>
+        `;
+
+                const clients = data.message || [];
+
+                clients.forEach(item => {
+
+                    const value = item.name + " - " + item.customer_name;
+                    const label = item.name + " - " + item.customer_name || item.name + " - " + item.customer_name;
+
+                    if (!value) return;
+
+                    const option = document.createElement("option");
+
+                    option.value = value;
+                    option.textContent = label;
+
+                    select.appendChild(option);
+
+                });
+
+            })
+            .catch(error => {
+
+                console.error("Client API Error:", error);
+
+            });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        loadClient();
+
+        loadDVRData();
+
+    });
+
+</script>
+
+<script>
+    function renderReport() {
+
+        const employee =
+            document.getElementById("employeeFilter")?.value || "";
+
+        const visitType =
+            document.getElementById("reportVisitType")?.value || "";
+
+        const fromDate =
+            document.getElementById("reportFrom")?.value || "";
+
+        const toDate =
+            document.getElementById("reportTo")?.value || "";
+
+        const clientType =
+            document.getElementById("reportClientType")?.value || "";
+
+        const client =
+            document.getElementById("reportClientFilter")?.value || "";
+
+        console.log("FILTER VALUES:", {
+            employee,
+            visitType,
+            fromDate,
+            toDate,
+            clientType,
+            client
+        });
+
+        let filteredData = [...dvrData];
+
+        if (employee) {
+
+            filteredData = filteredData.filter(row => {
+
+                return row.sales_person === employee;
+
+            });
+
+        }
+
+        if (visitType) {
+
+            filteredData = filteredData.filter(row => {
+
+                return row.visit_type === visitType;
+
+            });
+
+        }
+
+        if (fromDate) {
+
+            filteredData = filteredData.filter(row => {
+
+                return row.visit_date >= fromDate;
+
+            });
+
+        }
+
+        if (toDate) {
+
+            filteredData = filteredData.filter(row => {
+
+                return row.visit_date <= toDate;
+
+            });
+
+        }
+
+        if (clientType) {
+
+            filteredData = filteredData.filter(row => {
+
+                return row.client_type === clientType;
+
+            });
+
+        }
+
+        if (client) {
+
+            filteredData = filteredData.filter(row => {
+
+                return row.client === client;
+
+            });
+
+        }
+
+        console.log("Filtered DVR Data:", filteredData);
+
+        updateKPIs(filteredData);
+        const originalData = dvrData;
+
+        dvrData = filteredData;
+
+        renderVisitRecords();
+        renderFollowUpReport();
+        updateKPIs();
+
+        dvrData = originalData;
+
+    }
+
+    function clearReportFilters() {
+
+        document.getElementById("employeeFilter").value = "";
+        document.getElementById("reportVisitType").value = "";
+        document.getElementById("reportFrom").value = "";
+        document.getElementById("reportTo").value = "";
+        document.getElementById("reportClientType").value = "";
+        document.getElementById("reportClientFilter").value = "";
+
+        loadDVRData();
+    }
+
+    function updateKPIs() {
+
+        const total =
+            dvrData.length;
+
+        const approved =
+            dvrData.filter(row =>
+                row.approval_status === "Approved"
+            ).length;
+
+        const pending =
+            dvrData.filter(row =>
+                row.approval_status === "Pending"
+            ).length;
+
+        const rejected =
+            dvrData.filter(row =>
+                row.approval_status === "Rejected"
+            ).length;
+
+        const salesGm =
+            dvrData.reduce((total, row) => {
+
+                return total + (
+                    parseFloat(row.sales_gm) || 0
+                );
+
+            }, 0);
+
+        const kpiTotal =
+            document.getElementById("kpiTotal");
+
+        const kpiApproved =
+            document.getElementById("kpiApproved");
+
+        const kpiPending =
+            document.getElementById("kpiPending");
+
+        const kpiRejected =
+            document.getElementById("kpiRejected");
+
+        const kpiSalesGm =
+            document.getElementById("kpiSalesGm");
+        if (kpiTotal)
+            kpiTotal.textContent = total;
+
+        if (kpiApproved)
+            kpiApproved.textContent = approved;
+
+        if (kpiPending)
+            kpiPending.textContent = pending;
+
+        if (kpiRejected)
+            kpiRejected.textContent = rejected;
+
+        if (kpiSalesGm)
+            kpiSalesGm.textContent = salesGm.toFixed(2);
+
+    }
+</script>
+
+<div class="page" id="reportPage">
+
+    <div class="card">
+
+        <div class="card-header">
+
+            <h2>Sales Person Visit Report</h2>
+
+            <div class="sub" id="reportSub">
+                Visit performance overview
+            </div>
+
+        </div>
+
+        <div class="filter-bar">
+
+            <div class="fitem">
+
+                <label>Visit Type</label>
+
+                <select id="reportVisitType" onchange="renderReport()">
+                    <option value="">All</option>
+                </select>
+
+            </div>
+
+            <div class="fitem">
+
+                <label>From Date</label>
+
+                <input type="date" id="reportFrom" onchange="renderReport()">
+
+            </div>
+
+            <div class="fitem">
+
+                <label>To Date</label>
+
+                <input type="date" id="reportTo" onchange="renderReport()">
+
+            </div>
+
+            <div class="fitem">
+
+                <label>Client Type</label>
+
+                <select id="reportClientType" onchange="renderReport(); toggleClientNameFilter();">
+
+                    <option value="">
+                        All (Existing + New)
+                    </option>
+
+                    <option value="Existing Client">
+                        Existing Clients
+                    </option>
+
+                    <option value="New Client">
+                        New Clients
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div class="fitem" id="clientNameFilterWrap">
+
+                <label>Client Name</label>
+
+                <select id="reportClientFilter" onchange="renderReport()">
+                    <option value="">All Clients</option>
+                </select>
+
+            </div>
+
+            <div class="fitem">
+
+                <button class="secondary small" type="button" onclick="clearReportFilters()">
+                    Clear Filters
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="section" id="lockedNoteWrap" style="display:none;">
+
+            <div class="locked-note">
+                🔒 You are viewing only your own visit records.
+                Sales Managers can view data across all executives.
+            </div>
+
+        </div>
+
+        <div class="section">
+
+            <div class="kpi-grid">
+
+                <div class="kpi">
+                    <div class="val" id="kpiTotal">0</div>
+                    <div class="lbl">Total Visits</div>
+                </div>
+
+                <div class="kpi">
+                    <div class="val" id="kpiApproved">0</div>
+                    <div class="lbl">Approved</div>
+                </div>
+
+                <div class="kpi">
+                    <div class="val" id="kpiPending">0</div>
+                    <div class="lbl">Pending</div>
+                </div>
+
+                <div class="kpi">
+                    <div class="val" id="kpiRejected">0</div>
+                    <div class="lbl">Rejected</div>
+                </div>
+
+                <div class="kpi">
+                    <div class="val" id="kpiSalesGm">0</div>
+                    <div class="lbl">Total Expected Sales (gm)</div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="section">
+
+            <div class="split-grid">
+
+                <div>
+
+                    <div class="section-title">
+                        Visit Records
+                    </div>
+
+                    <div class="table-wrap">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>Date</th>
+                                    <th>Executive</th>
+                                    <th>Branch</th>
+                                    <th>Client</th>
+                                    <th>Visit Type</th>
+                                    <th>Purpose</th>
+                                    <th>Status</th>
+                                    <th>Sales (gm)</th>
+                                    <th>Approval Status</th>
+                                    <th>Next Visit</th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="reportTable"></tbody>
+
+                        </table>
+
+                    </div>
+
+                    <div class="empty-state" id="reportEmpty" style="display:none;">
+                        No visit records match the selected filters.
+                    </div>
+
+                </div>
+
+                <div>
+
+                    <div class="section-title">
+                        Follow-Up Report
+                    </div>
+
+                    <div class="hint" style="margin-bottom:12px;">
+                        All visits with a Next Visit Date,
+                        ordered by the soonest follow-up first.
+                    </div>
+
+                    <div class="followup-list" id="followUpList"></div>
+
+                    <div class="empty-state" id="followUpEmpty" style="display:none;">
+                        No upcoming follow-ups scheduled.
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+    function toggleClientNameFilter() {
+
+        const clientType =
+            document.getElementById("reportClientType")?.value || "";
+
+        const wrap =
+            document.getElementById("clientNameFilterWrap");
+
+        const select =
+            document.getElementById("reportClientFilter");
+
+        const label =
+            document.getElementById("clientFilterLabel");
+
+        if (!wrap || !select) return;
+
+        if (clientType === "Existing Client") {
+
+            wrap.style.display = "";
+
+            if (label) {
+                label.textContent = "Client Name";
+            }
+
+            select.innerHTML = `
+            <option value="">All Clients</option>
+        `;
+
+            fetch(
+                "/api/method/get_customer_from_gk",
+                {
+                    method: "GET",
+                    credentials: "include",
+                    headers: {
+                        "Accept": "application/json"
+                    }
+                }
+            )
+                .then(response => {
+
+                    if (!response.ok) {
+                        throw new Error(
+                            `HTTP Error: ${response.status}`
+                        );
+                    }
+
+                    return response.json();
+                })
+                .then(data => {
+
+                    console.log(
+                        "Existing Customer API:",
+                        data
+                    );
+
+                    const rows = data.message || [];
+
+                    if (!Array.isArray(rows)) {
+                        return;
+                    }
+
+                    rows.forEach(row => {
+
+                        if (!row.name) return;
+
+                        const option =
+                            document.createElement("option");
+
+                        option.value = row.name;
+
+                        option.textContent =
+                            `${row.name} - ${row.customer_name || ""}`;
+
+                        select.appendChild(option);
+                    });
+
+                    console.log(
+                        "Existing Customers Loaded:",
+                        rows.length
+                    );
+
+                })
+                .catch(error => {
+
+                    console.error(
+                        "Existing Customer API Error:",
+                        error
+                    );
+
+                });
+
+        }
+
+        else if (clientType === "New Client") {
+
+            wrap.style.display = "";
+
+            if (label) {
+                label.textContent = "Party Name";
+            }
+
+            select.innerHTML = `
+            <option value="">All New Clients</option>
+        `;
+
+            fetch(
+                "/api/method/gke_crm.api.dvr.get_new_client_party_names",
+                {
+                    method: "GET",
+                    credentials: "include",
+                    headers: {
+                        "Accept": "application/json"
+                    }
+                }
+            )
+                .then(response => {
+
+                    if (!response.ok) {
+                        throw new Error(
+                            `HTTP Error: ${response.status}`
+                        );
+                    }
+
+                    return response.json();
+                })
+                .then(data => {
+
+                    console.log(
+                        "New Client Party API:",
+                        data
+                    );
+
+                    const rows = data.message || [];
+
+                    rows.forEach(row => {
+
+                        if (!row.party_name) return;
+
+                        const option =
+                            document.createElement("option");
+
+                        option.value = row.party_name;
+
+                        option.textContent =
+                            row.party_name;
+
+                        select.appendChild(option);
+                    });
+
+                })
+                .catch(error => {
+
+                    console.error(
+                        "New Client API Error:",
+                        error
+                    );
+
+                });
+
+        }
+
+        else {
+
+            wrap.style.display = "none";
+
+            select.innerHTML = `
+            <option value="">All Clients</option>
+        `;
+
+            select.value = "";
+        }
+
+        renderReport();
+    }
+    document.addEventListener("DOMContentLoaded", toggleClientNameFilter);
+
+    function openDVR(name) {
+
+        if (!name) {
+            return;
+        }
+        window.location.href = `/app/daily-visit-report/new`;
+    }
+
+    let dvrData = [];
+
+    function getStatusBadgeClass(status) {
+
+        const s = (status || "").toString().toLowerCase();
+
+        if (s.includes("approve") && !s.includes("pending")) {
+            return "approved";
+        }
+
+        if (s.includes("pending")) {
+            return "pending";
+        }
+
+        if (s.includes("reject")) {
+            return "rejected";
+        }
+
+        return "direct";
+
+    }
+
+    function loadDVRData() {
+
+        fetch("/api/method/gke_crm.api.dvr.get_dvr_for_approval", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+            .then(response => {
+
+                if (!response.ok) {
+                    throw new Error(`HTTP Error: ${response.status}`);
+                }
+
+                return response.json();
+
+            })
+            .then(data => {
+
+                console.log("DVR API Response:", data);
+
+                dvrData = data.message || [];
+
+                console.log("DVR Data:", dvrData);
+
+                renderVisitRecords();
+                renderFollowUpReport();
+                updateKPIs(dvrData);
+
+            })
+            .catch(error => {
+
+                console.error("DVR API Error:", error);
+
+                dvrData = [];
+
+                renderVisitRecords();
+                renderFollowUpReport();
+                updateKPIs(dvrData);
+
+            });
+    }
+
+    function renderVisitRecords() {
+
+        const tbody = document.getElementById("reportTable");
+        const empty = document.getElementById("reportEmpty");
+
+        if (!tbody) return;
+
+        tbody.innerHTML = "";
+
+        if (!dvrData.length) {
+
+            empty.style.display = "block";
+
+            return;
+        }
+
+        empty.style.display = "none";
+
+        dvrData.forEach(row => {
+
+            const tr = document.createElement("tr");
+            const approvalBadgeClass = getStatusBadgeClass(row.approval_status);
+
+            tr.innerHTML = `
+
+            <td>
+                ${row.visit_date || "-"}
+            </td>
+
+            <td>
+                ${row.sales_person || "-"}
+            </td>
+
+            <td>
+                ${row.branch || "-"}
+            </td>
+
+            <td>
+                ${row.client || "-"}
+            </td>
+
+            <td>
+                ${row.visit_type || "-"}
+            </td>
+
+            <td>
+                ${row.purpose || "-"}
+            </td>
+
+            <td>
+                ${row.approval_status || "-"}
+            </td>
+
+            <td>
+                ${row.sales_gm != null ? row.sales_gm : 0}
+            </td>
+
+            <td>
+                ${row.approval_status
+                    ? `<span class="badge ${approvalBadgeClass}">${row.approval_status}</span>`
+                    : "-"
+                }
+            </td>
+
+            <td>
+                ${row.next_visit_date || "-"}
+            </td>
+
+        `;
+
+            tbody.appendChild(tr);
+
+        });
+
+    }
+
+    function renderFollowUpReport() {
+
+        const container =
+            document.getElementById("followUpList");
+
+        const empty =
+            document.getElementById("followUpEmpty");
+
+        if (!container) return;
+
+        container.innerHTML = "";
+
+        let followUps =
+            dvrData.filter(row => {
+
+                return row.next_visit_date;
+
+            });
+
+        followUps.sort((a, b) => {
+
+            return new Date(a.next_visit_date) -
+                new Date(b.next_visit_date);
+
+        });
+
+        if (!followUps.length) {
+
+            empty.style.display = "block";
+
+            return;
+        }
+
+        empty.style.display = "none";
+
+        const today = new Date();
+
+        today.setHours(0, 0, 0, 0);
+
+        followUps.forEach(row => {
+
+            const div =
+                document.createElement("div");
+
+            div.className =
+                "followup-item";
+
+            const nextDate =
+                new Date(row.next_visit_date);
+
+            const isUpcoming =
+                nextDate >= today;
+
+            const statusClass =
+                getStatusBadgeClass(
+                    row.approval_status
+                );
+
+            const metaParts = [
+                row.sales_person,
+                row.branch,
+                row.priority
+                    ? ("Priority: " + row.priority)
+                    : null
+            ].filter(Boolean);
+
+            const note =
+                row.next_visit_note ||
+                row.remarks ||
+                row.purpose ||
+                "";
+
+            div.innerHTML = `
+
+            <div class="fu-top">
+
+                <div class="fu-date">
+                    <strong>Next Visit Date:</strong>
+                    ${row.next_visit_date || "-"}
+                </div>
+
+                ${isUpcoming
+                    ? '<span class="badge upcoming">Upcoming</span>'
+                    : ""
+                }
+
+            </div>
+
+            <div class="fu-client">
+                ${row.client_type === "New Client" ? (row.party_name || "-") : (row.client || "-")}
+            </div>
+
+            <div class="fu-meta">
+                ${metaParts.join(" • ")}
+            </div>
+
+            ${note
+                    ? `<div class="fu-action">${note}</div>`
+                    : ""
+                }
+
+            <div class="fu-bottom">
+
+                <span class="badge ${statusClass}">
+                    ${row.approval_status || "-"}
+                </span>
+
+            </div>
+
+            <div style="margin-top:10px;">
+
+                <span
+                    class="hint"
+                    style="
+                        color:var(--erp-primary-dark);
+                        font-weight:700;
+                        cursor:pointer;
+                    "
+                    onclick="openDVR('${row.name}')"
+                >
+                    Click to log follow-up visit →
+                </span>
+
+            </div>
+
+        `;
+
+            container.appendChild(div);
+
+        });
+
+    }
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const page = document.getElementById("reportPage");
+
+        if (page) {
+            page.classList.add("active");
+        }
+
+    });
+</script> -->

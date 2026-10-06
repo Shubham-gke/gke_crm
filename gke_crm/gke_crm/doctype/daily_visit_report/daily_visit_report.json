@@ -1,0 +1,413 @@
+{
+ "actions": [],
+ "autoname": "format:DVR-{#####}",
+ "creation": "2026-09-01 20:03:03.657740",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "sb_visit_info",
+  "sales_person",
+  "sales_executive_name",
+  "branch",
+  "col_visit_1",
+  "reporting_manager",
+  "visit_date",
+  "visit_type",
+  "sb_customer_info",
+  "client_type",
+  "client",
+  "client_category",
+  "col_customer_1",
+  "contact_person",
+  "mobile_number",
+  "sb_new_client",
+  "party_name",
+  "person_name",
+  "lead_mobile",
+  "lead_email",
+  "col_new_client_1",
+  "nature_of_business",
+  "no_of_stores",
+  "lead_status",
+  "category_of_interest",
+  "lead_address",
+  "sb_location",
+  "lead_location",
+  "view_location",
+  "sb_meeting_details",
+  "purpose",
+  "status",
+  "col_meeting_1",
+  "selection",
+  "visit_photo",
+  "discussion",
+  "products_pitched",
+  "sb_commercial",
+  "sales_gm",
+  "expected_order",
+  "priority",
+  "col_commercial_1",
+  "follow_up_action",
+  "next_visit_date",
+  "remarks",
+  "sb_approval",
+  "approval_status",
+  "approved_by",
+  "col_approval_1",
+  "rejection_remarks",
+  "manager_remarks",
+  "parent_lead"
+ ],
+ "fields": [
+  {
+   "fieldname": "sb_visit_info",
+   "fieldtype": "Section Break",
+   "label": "Visit Information"
+  },
+  {
+   "default": "user",
+   "fieldname": "sales_person",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Sales Executive",
+   "options": "User",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Branch",
+   "options": "Surat\nMumbai\nAhmedabad\nJaipur",
+   "reqd": 1
+  },
+  {
+   "fieldname": "col_visit_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "reporting_manager",
+   "fieldtype": "Link",
+   "label": "Reporting Manager",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "default": "Today",
+   "fieldname": "visit_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Visit Date",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "visit_type",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Visit Type",
+   "options": "Visit Type",
+   "reqd": 1
+  },
+  {
+   "fieldname": "sb_customer_info",
+   "fieldtype": "Section Break",
+   "label": "Customer Information"
+  },
+  {
+   "default": "Existing Client",
+   "fieldname": "client_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Client Type",
+   "options": "Existing Client\nNew Client",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:doc.client_type=='Existing Client'",
+   "fieldname": "client",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Customer Name - Code"
+  },
+  {
+   "depends_on": "eval:doc.client_type=='Existing Client'",
+   "fieldname": "client_category",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Customer Grade",
+   "read_only": 1
+  },
+  {
+   "fieldname": "col_customer_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.client_type=='Existing Client'",
+   "fieldname": "contact_person",
+   "fieldtype": "Data",
+   "label": "Contact Person"
+  },
+  {
+   "depends_on": "eval:doc.client_type=='Existing Client'",
+   "fieldname": "mobile_number",
+   "fieldtype": "Data",
+   "label": "Mobile Number",
+   "options": "Phone"
+  },
+  {
+   "depends_on": "eval:doc.client_type=='New Client'",
+   "fieldname": "sb_new_client",
+   "fieldtype": "Section Break",
+   "label": "New Client / Lead Details"
+  },
+  {
+   "fieldname": "party_name",
+   "fieldtype": "Data",
+   "label": "Party Name"
+  },
+  {
+   "fieldname": "person_name",
+   "fieldtype": "Data",
+   "label": "Person Name"
+  },
+  {
+   "fieldname": "lead_mobile",
+   "fieldtype": "Data",
+   "label": "Mobile Number",
+   "options": "Phone"
+  },
+  {
+   "fieldname": "lead_email",
+   "fieldtype": "Data",
+   "label": "Email Address",
+   "options": "Email"
+  },
+  {
+   "fieldname": "col_new_client_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "nature_of_business",
+   "fieldtype": "Select",
+   "label": "Nature of Business",
+   "options": "\nJob work\nOutright"
+  },
+  {
+   "fieldname": "no_of_stores",
+   "fieldtype": "Int",
+   "label": "No. of Stores"
+  },
+  {
+   "fieldname": "lead_status",
+   "fieldtype": "Select",
+   "label": "Lead Status",
+   "options": "\nNew\nContacted\nIn-Process\nConverted\nNot-Interested"
+  },
+  {
+   "description": "Comma separated dummy values e.g. Necklace, Ring, Bangles",
+   "fieldname": "category_of_interest",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "label": "Category of Interest"
+  },
+  {
+   "fieldname": "lead_address",
+   "fieldtype": "Small Text",
+   "label": "Address"
+  },
+  {
+   "fieldname": "sb_location",
+   "fieldtype": "Section Break",
+   "label": "Location"
+  },
+  {
+   "fieldname": "lead_location",
+   "fieldtype": "Data",
+   "label": "Current Location (Lat, Lng)"
+  },
+  {
+   "fieldname": "view_location",
+   "fieldtype": "HTML",
+   "label": "View Location"
+  },
+  {
+   "fieldname": "sb_meeting_details",
+   "fieldtype": "Section Break",
+   "label": "Meeting Details"
+  },
+  {
+   "fieldname": "purpose",
+   "fieldtype": "Link",
+   "label": "Purpose of Visit",
+   "options": "Purpose Of Visit",
+   "reqd": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Link",
+   "label": "Status of Visit",
+   "options": "Status Of Visit",
+   "reqd": 1
+  },
+  {
+   "fieldname": "col_meeting_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.client_type=='Existing Client'",
+   "fieldname": "selection",
+   "fieldtype": "Select",
+   "label": "Selection Made",
+   "options": "\nYes\nNo"
+  },
+  {
+   "depends_on": "eval:doc.visit_type!='Phone Call / Virtual Selection'",
+   "fieldname": "visit_photo",
+   "fieldtype": "Attach Image",
+   "label": "Visit Photo"
+  },
+  {
+   "fieldname": "discussion",
+   "fieldtype": "Small Text",
+   "label": "Discussion Summary"
+  },
+  {
+   "depends_on": "eval:['Sales','Delivery','Phone Call / Virtual Selection'].includes(doc.visit_type)",
+   "fieldname": "products_pitched",
+   "fieldtype": "Data",
+   "label": "Products Pitched"
+  },
+  {
+   "fieldname": "sb_commercial",
+   "fieldtype": "Section Break",
+   "label": "Commercial Information"
+  },
+  {
+   "depends_on": "eval:doc.client_type=='Existing Client'",
+   "description": "Existing Client ke liye read-only \u2014 selection ho jaane par backend/script se auto-calculate hoga.",
+   "fieldname": "sales_gm",
+   "fieldtype": "Float",
+   "label": "Sales (gm)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "expected_order",
+   "fieldtype": "Float",
+   "label": "Expected Order (gm)"
+  },
+  {
+   "default": "Medium",
+   "depends_on": "eval:doc.client_type=='Existing Client'",
+   "fieldname": "priority",
+   "fieldtype": "Select",
+   "label": "Priority",
+   "options": "Low\nMedium\nHigh\nCritical"
+  },
+  {
+   "fieldname": "col_commercial_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "follow_up_action",
+   "fieldtype": "Small Text",
+   "label": "Follow-up Action"
+  },
+  {
+   "fieldname": "next_visit_date",
+   "fieldtype": "Date",
+   "label": "Next Visit Date"
+  },
+  {
+   "depends_on": "eval:doc.client_type=='Existing Client'",
+   "fieldname": "remarks",
+   "fieldtype": "Data",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "sb_approval",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Approval"
+  },
+  {
+   "fieldname": "approval_status",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Approval Status",
+   "options": "Pending Approval\nApproved\nRejected",
+   "read_only": 1
+  },
+  {
+   "fieldname": "approved_by",
+   "fieldtype": "Link",
+   "label": "Approved / Rejected By",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "col_approval_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.approval_status=='Rejected'",
+   "fieldname": "rejection_remarks",
+   "fieldtype": "Small Text",
+   "label": "Rejection Remarks"
+  },
+  {
+   "fieldname": "manager_remarks",
+   "fieldtype": "Small Text",
+   "label": "Manager Remarks"
+  },
+  {
+   "fieldname": "parent_lead",
+   "fieldtype": "Link",
+   "label": "Parent Lead (Sub-lead chaining)",
+   "options": "Daily Visit Report",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "sales_person.full_name",
+   "fieldname": "sales_executive_name",
+   "fieldtype": "Data",
+   "label": "Sales Executive Name"
+  }
+ ],
+ "links": [],
+ "modified": "2026-10-03 17:12:14.914472",
+ "modified_by": "Administrator",
+ "module": "gke_crm",
+ "name": "Daily Visit Report",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "if_owner": 1,
+   "read": 1,
+   "role": "Sales User",
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "read": 1,
+   "role": "Sales Manager",
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "read": 1,
+   "role": "System Manager",
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

@@ -1,0 +1,8 @@
+{
+  "doctype": "Page",
+  "module": "gke_crm",
+  "name": "administrator-management",
+  "page_name": "administrator-management",
+  "standard": "Yes",
+  "title": "Administrator Management"
+}

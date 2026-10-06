@@ -1,0 +1,1773 @@
+<div class="page" id="approvalPage">
+
+    <div class="card">
+
+        <!-- HEADER -->
+        <div class="card-header">
+            <h2>Approval Dashboard</h2>
+            <div class="sub" id="approvalSub">
+                Visits pending your review
+            </div>
+        </div>
+
+
+        <!-- FILTER BAR -->
+        <div class="filter-bar" id="approvalFilterBar">
+
+            <div class="fitem">
+
+                <label>From Date</label>
+
+                <input type="date" id="approvalFrom" onchange="renderApprovalDashboard()">
+
+            </div>
+
+
+            <div class="fitem">
+
+                <label>To Date</label>
+
+                <input type="date" id="approvalTo" onchange="renderApprovalDashboard()">
+
+            </div>
+
+
+            <div class="fitem">
+
+                <button class="secondary small" type="button" onclick="clearApprovalFilters()">
+                    Clear Filters
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- CLIENT DETAILS -->
+        <div class="section client-detail-card" id="clientDetailSection" style="display:none;">
+
+            <div class="section-title">
+                Client Details
+            </div>
+
+            <div class="grid" id="clientDetailGrid"></div>
+
+        </div>
+
+
+        <!-- APPROVAL TABLE -->
+        <div class="section" id="approvalSection">
+
+            <div class="table-wrap">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>Executive</th>
+                            <th>Branch</th>
+                            <th>Client</th>
+                            <th>Visit Type</th>
+                            <th>Visit Date</th>
+                            <th>Purpose / Status</th>
+                            <th>Photo</th>
+
+                            <th>Sales (gm)</th>
+                            <th>Submitted</th>
+                            <th>Client Type</th>
+                            <th>Approval Status</th>
+                            <th>Details</th>
+                            <th>Action</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="approvalTable"></tbody>
+
+                </table>
+
+            </div>
+
+
+            <div class="empty-state" id="approvalEmpty" style="display:none;">
+                No visit records to display yet.
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<style>
+    /* =========================================================
+   PAGE
+========================================================= */
+
+    #approvalPage {
+        padding: 20px;
+        background: #ffffff;
+
+        min-height: 100vh;
+
+        font-family:
+            Inter,
+            -apple-system,
+            BlinkMacSystemFont,
+            "Segoe UI",
+            sans-serif;
+    }
+
+    #approvalPage * {
+        box-sizing: border-box;
+    }
+
+
+    /* =========================================================
+   MAIN CARD
+========================================================= */
+
+    #approvalPage .card {
+        width: 100%;
+
+        background: #ffffff;
+
+        border: 1px solid #d0d0d0;
+
+        border-radius: 16px;
+
+        overflow: hidden;
+
+        box-shadow:
+            0 8px 28px rgba(0, 0, 0, 0.08),
+            0 2px 6px rgba(0, 0, 0, 0.04);
+    }
+
+
+    /* =========================================================
+   HEADER
+========================================================= */
+
+    #approvalPage .card-header {
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: space-between;
+
+        min-height: 88px;
+
+        padding: 20px 26px;
+
+        background: #000000;
+
+        border-bottom: none;
+
+        position: relative;
+
+        overflow: hidden;
+    }
+
+
+    #approvalPage .card-header::after {
+
+        content: "";
+
+        position: absolute;
+
+        width: 220px;
+
+        height: 220px;
+
+        right: -80px;
+
+        top: -110px;
+
+        border-radius: 50%;
+
+        background: rgba(255, 255, 255, 0.06);
+
+        pointer-events: none;
+    }
+
+
+    #approvalPage .card-header h2 {
+
+        margin: 0;
+
+        font-size: 22px;
+
+        line-height: 1.3;
+
+        font-weight: 700;
+
+        color: #ffffff;
+    }
+
+
+    #approvalPage .sub {
+
+        margin-top: 5px;
+
+        color: rgba(255, 255, 255, 0.78);
+
+        font-size: 13px;
+    }
+
+
+    /* =========================================================
+   FILTER BAR
+========================================================= */
+
+    #approvalPage .filter-bar {
+
+        display: flex;
+
+        flex-wrap: wrap;
+
+        align-items: flex-end;
+
+        gap: 14px;
+
+        padding: 18px 26px 20px;
+
+        background: #f5f5f5;
+
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+
+    #approvalPage .fitem {
+
+        display: flex;
+
+        flex-direction: column;
+
+        gap: 6px;
+    }
+
+
+    #approvalPage .fitem label {
+
+        font-size: 11px;
+
+        font-weight: 700;
+
+        color: #4a4a4a;
+
+        text-transform: uppercase;
+
+        letter-spacing: .35px;
+    }
+
+
+    #approvalPage input[type="date"] {
+
+        height: 38px;
+
+        min-width: 170px;
+
+        padding: 7px 10px;
+
+        border: 1px solid #c9c9c9;
+
+        border-radius: 8px;
+
+        background: #ffffff;
+
+        color: #222222;
+
+        font-size: 12px;
+
+        outline: none;
+
+        transition: all .2s ease;
+    }
+
+
+    #approvalPage input[type="date"]:hover {
+
+        border-color: #9a9a9a;
+    }
+
+
+    #approvalPage input[type="date"]:focus {
+
+        border-color: #000000;
+
+        box-shadow:
+            0 0 0 3px rgba(0, 0, 0, .10);
+    }
+
+
+    #approvalPage .secondary {
+
+        height: 38px;
+
+        padding: 0 15px;
+
+        display: inline-flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        gap: 7px;
+
+        border-radius: 8px;
+
+        border: 1px solid #c9c9c9;
+
+        background: #ffffff;
+
+        color: #333333;
+
+        font-size: 11px;
+
+        font-weight: 600;
+
+        cursor: pointer;
+
+        transition: all .2s ease;
+
+        white-space: nowrap;
+    }
+
+
+    #approvalPage .secondary:hover {
+
+        background: #f0f0f0;
+
+        border-color: #9a9a9a;
+
+        color: #000000;
+
+        transform: translateY(-1px);
+
+        box-shadow:
+            0 4px 10px rgba(0, 0, 0, .10);
+    }
+
+
+    /* =========================================================
+   SECTION / TABLE AREA
+========================================================= */
+
+    #approvalPage .section {
+
+        padding: 22px 26px;
+    }
+
+
+    #approvalPage .section-title {
+
+        font-size: 16px;
+
+        font-weight: 700;
+
+        color: #1a1a1a;
+
+        margin-bottom: 12px;
+    }
+
+
+    #approvalPage .table-wrap {
+
+        width: 100%;
+
+        overflow-x: auto;
+
+        border: 1px solid #dcdcdc;
+
+        border-radius: 11px;
+
+        box-shadow:
+            0 2px 8px rgba(0, 0, 0, .035);
+    }
+
+
+    #approvalPage .table-wrap::-webkit-scrollbar {
+
+        height: 7px;
+    }
+
+
+    #approvalPage .table-wrap::-webkit-scrollbar-track {
+
+        background: #f1f1f1;
+    }
+
+
+    #approvalPage .table-wrap::-webkit-scrollbar-thumb {
+
+        background: #b5b5b5;
+
+        border-radius: 20px;
+    }
+
+
+    #approvalPage table {
+
+        width: 100%;
+
+        min-width: 1650px;
+
+        border-collapse: separate;
+
+        border-spacing: 0;
+
+        font-size: 12px;
+    }
+
+
+    #approvalPage th {
+
+        padding: 12px 11px;
+
+        background: #f2f2f2;
+
+        color: #4a4a4a;
+
+        font-size: 10px;
+
+        font-weight: 700;
+
+        text-align: left;
+
+        text-transform: uppercase;
+
+        letter-spacing: .3px;
+
+        white-space: nowrap;
+
+        border-bottom: 1px solid #dcdcdc;
+    }
+
+
+    #approvalPage td {
+
+        padding: 12px 11px;
+
+        border-bottom: 1px solid #ececec;
+
+        color: #2b2b2b;
+
+        vertical-align: middle;
+
+        background: #ffffff;
+    }
+
+
+    #approvalPage tbody tr:hover td {
+
+        background: #f7f7f7;
+    }
+
+
+    #approvalPage tbody tr:last-child td {
+
+        border-bottom: none;
+    }
+
+
+    /* =========================================================
+   STATUS
+========================================================= */
+
+    #approvalPage .status {
+
+        display: inline-flex;
+
+        align-items: center;
+
+        padding: 5px 10px;
+
+        border-radius: 20px;
+
+        font-size: 10px;
+
+        font-weight: 700;
+
+        white-space: nowrap;
+    }
+
+
+    #approvalPage .status-pending {
+
+        background: #f2f2f2;
+
+        border: 1px solid #c9c9c9;
+
+        color: #444444;
+    }
+
+
+    #approvalPage .status-approved {
+
+        background: #000000;
+
+        border: 1px solid #000000;
+
+        color: #ffffff;
+    }
+
+
+    #approvalPage .status-rejected {
+
+        background: #ffffff;
+
+        border: 1px solid #000000;
+
+        color: #000000;
+    }
+
+
+    /* =========================================================
+   PHOTO
+========================================================= */
+
+    #approvalPage .photo-btn {
+
+        padding: 6px 10px;
+
+        border: 1px solid #c9c9c9;
+
+        border-radius: 7px;
+
+        background: #f5f5f5;
+
+        color: #1a1a1a;
+
+        font-size: 10px;
+
+        font-weight: 600;
+
+        cursor: pointer;
+
+        transition: all .2s ease;
+    }
+
+
+    #approvalPage .photo-btn:hover {
+
+        background: #e8e8e8;
+
+        border-color: #9a9a9a;
+    }
+
+
+    /* =========================================================
+   EDIT BUTTON (Action column - New Client rows)
+========================================================= */
+
+    #approvalPage .edit-btn {
+
+        display: inline-flex;
+
+        align-items: center;
+
+        gap: 5px;
+
+        padding: 6px 12px;
+
+        border: 1px solid #000000;
+
+        border-radius: 7px;
+
+        background: #000000;
+
+        color: #ffffff;
+
+        font-size: 10.5px;
+
+        font-weight: 700;
+
+        cursor: pointer;
+
+        transition: all .2s ease;
+
+        white-space: nowrap;
+    }
+
+
+    #approvalPage .edit-btn:hover {
+
+        background: #222222;
+
+        border-color: #222222;
+
+        transform: translateY(-1px);
+
+        box-shadow:
+            0 4px 10px rgba(0, 0, 0, .15);
+    }
+
+
+    #approvalPage .action-empty {
+
+        color: #b0b0b0;
+
+        font-size: 12px;
+    }
+
+
+    /* =========================================================
+   CHECKBOX
+========================================================= */
+
+    #approvalPage input[type="checkbox"] {
+
+        width: 16px;
+
+        height: 16px;
+
+        accent-color: #000000;
+
+        cursor: pointer;
+    }
+
+
+    /* =========================================================
+   EMPTY STATE
+========================================================= */
+
+    #approvalPage .empty-state {
+
+        padding: 50px 25px;
+
+        text-align: center;
+
+        color: #8a8a8a;
+
+        font-size: 13px;
+    }
+
+    /* =========================================================
+   DETAILS BUTTON
+========================================================= */
+
+    /* ================================
+   DVR DETAILS
+================================ */
+
+    #approvalPage .details-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+
+        min-width: 105px;
+        padding: 7px 12px;
+
+        border: 1px solid #c9c9c9;
+        border-radius: 7px;
+
+        background: #f5f5f5;
+        color: #1a1a1a;
+
+        font-size: 10.5px;
+        font-weight: 700;
+
+        cursor: pointer;
+        white-space: nowrap;
+
+        transition: all 0.2s ease;
+    }
+
+    #approvalPage .details-btn:hover {
+        background: #e8e8e8;
+        border-color: #9a9a9a;
+        transform: translateY(-1px);
+    }
+
+
+    /* Expanded row */
+
+    #approvalPage .dvr-details-row {
+        display: none;
+    }
+
+    #approvalPage .dvr-details-row.show {
+        display: table-row;
+    }
+
+    #approvalPage .dvr-details-wrapper {
+        padding: 0 !important;
+        background: #fafafa;
+        border-top: none !important;
+    }
+
+
+    /* Main details card */
+
+    #approvalPage .dvr-details-card {
+        margin: 6px 10px 14px;
+
+        padding: 16px 18px;
+
+        background: #ffffff;
+
+        border: 1px solid #dcdcdc;
+        border-radius: 12px;
+
+        box-shadow:
+            0 4px 14px rgba(0, 0, 0, 0.06);
+    }
+
+
+    /* Header */
+
+    #approvalPage .details-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        margin-bottom: 14px;
+        padding-bottom: 10px;
+
+        border-bottom: 1px solid #e5e5e5;
+    }
+
+    #approvalPage .details-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        color: #000000;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    #approvalPage .details-title-icon {
+        width: 26px;
+        height: 26px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 7px;
+
+        background: #ececec;
+        color: #000000;
+
+        font-size: 13px;
+    }
+
+
+    /* Grid */
+
+    #approvalPage .details-grid {
+        display: grid;
+
+        grid-template-columns:
+            repeat(3, minmax(180px, 1fr));
+
+        gap: 12px;
+    }
+
+
+    /* Individual item */
+
+    #approvalPage .detail-item {
+        min-height: 65px;
+
+        padding: 11px 13px;
+
+        background: #ffffff;
+
+        border: 1px solid #e3e3e3;
+        border-radius: 9px;
+
+        transition: all 0.2s ease;
+    }
+
+    #approvalPage .detail-item:hover {
+        border-color: #9a9a9a;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+    }
+
+
+    /* Label */
+
+    #approvalPage .detail-label {
+        margin-bottom: 6px;
+
+        color: #5f5f5f;
+
+        font-size: 9px;
+        font-weight: 800;
+
+        text-transform: uppercase;
+        letter-spacing: 0.45px;
+    }
+
+
+    /* Value */
+
+    #approvalPage .detail-value {
+        color: #1a1a1a;
+
+        font-size: 11.5px;
+        font-weight: 600;
+
+        line-height: 1.5;
+
+        word-break: break-word;
+    }
+
+
+    /* Full width fields */
+
+    #approvalPage .detail-wide {
+        grid-column: span 2;
+    }
+
+
+    /* Photo */
+
+    #approvalPage .detail-photo {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+
+        padding: 6px 10px;
+
+        border: 1px solid #c9c9c9;
+        border-radius: 6px;
+
+        background: #f0f0f0;
+        color: #1a1a1a;
+
+        font-size: 10px;
+        font-weight: 700;
+
+        cursor: pointer;
+    }
+
+    #approvalPage .detail-photo:hover {
+        background: #e4e4e4;
+    }
+
+
+    /* Loading */
+
+    #approvalPage .details-loading {
+        padding: 15px;
+
+        text-align: center;
+
+        color: #5f5f5f;
+        font-size: 11px;
+    }
+
+
+    /* Error */
+
+    #approvalPage .details-error {
+        padding: 12px;
+
+        text-align: center;
+
+        color: #000000;
+        font-size: 11px;
+    }
+
+
+    /* Responsive */
+
+    @media (max-width: 1000px) {
+
+        #approvalPage .details-grid {
+            grid-template-columns: repeat(2, minmax(160px, 1fr));
+        }
+
+    }
+
+    @media (max-width: 650px) {
+
+        #approvalPage .details-grid {
+            grid-template-columns: 1fr;
+        }
+
+        #approvalPage .detail-wide {
+            grid-column: span 1;
+        }
+
+        #approvalPage .dvr-details-card {
+            margin-left: 5px;
+            margin-right: 5px;
+        }
+
+    }
+
+
+    /* =========================================================
+   MOBILE
+========================================================= */
+
+    @media (max-width: 768px) {
+
+        #approvalPage {
+            padding: 10px;
+        }
+
+        #approvalPage .card-header {
+            padding: 17px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 13px;
+        }
+
+        #approvalPage .filter-bar {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+            padding: 17px;
+        }
+
+        #approvalPage .fitem {
+            width: 100%;
+        }
+
+        #approvalPage input[type="date"] {
+            width: 100%;
+        }
+
+        #approvalPage .section {
+            padding: 17px;
+        }
+    }
+</style>
+
+
+<script>
+
+    function toggleDVRDetails(name, button) {
+
+        if (!name || !button) return;
+
+        const detailsRow =
+            document.getElementById(`dvr-details-row-${name}`);
+
+        const detailsBox =
+            document.getElementById(`dvr-details-${name}`);
+
+        if (!detailsRow || !detailsBox) return;
+
+
+        /* =========================
+           CLOSE
+        ========================= */
+
+        if (detailsRow.classList.contains("show")) {
+
+            detailsRow.classList.remove("show");
+
+            button.innerHTML = "▼ View Details";
+
+            return;
+        }
+
+
+        /* =========================
+           OPEN
+        ========================= */
+
+        detailsRow.classList.add("show");
+
+        button.innerHTML = "▲ Hide Details";
+
+
+        /* =========================
+           ALREADY LOADED
+        ========================= */
+
+        if (detailsBox.dataset.loaded === "1") {
+            return;
+        }
+
+
+        detailsBox.innerHTML = `
+        <div class="details-loading">
+            Loading details...
+        </div>
+    `;
+
+
+        fetch(
+            `/api/method/gke_crm.api.dvr.get_sub_leads_by_parent?parent_lead_id=${encodeURIComponent(name)}`,
+            {
+                method: "GET",
+                credentials: "include",
+                headers: {
+                    "Accept": "application/json"
+                }
+            }
+        )
+
+            .then(response => {
+
+                if (!response.ok) {
+                    throw new Error(`HTTP Error: ${response.status}`);
+                }
+
+                return response.json();
+            })
+
+            .then(data => {
+
+                console.log("DVR Details API:", data);
+
+                const rows = data.message || [];
+
+
+                /* =========================
+                   NO DATA
+                ========================= */
+
+                if (!Array.isArray(rows) || rows.length === 0) {
+
+                    detailsBox.innerHTML = `
+                <div class="details-error">
+                    No Sub Lead details found.
+                </div>
+            `;
+
+                    return;
+                }
+
+
+                detailsBox.dataset.loaded = "1";
+
+
+                /* =========================
+                   TABLE
+                ========================= */
+
+                detailsBox.innerHTML = `
+
+            <div class="details-header">
+
+                <div class="details-title">
+                    <span class="details-title-icon">ℹ</span>
+                    Sub Lead Details
+                </div>
+
+                <div class="details-count">
+                    ${rows.length}
+                    Record${rows.length > 1 ? "s" : ""}
+                </div>
+
+            </div>
+
+
+            <div class="sub-lead-table-wrapper">
+
+                <table class="sub-lead-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th class="col-sr">#</th>
+
+                            <th class="col-name">
+                                Sub Lead
+                            </th>
+
+                            <th class="col-purpose">
+                                Purpose
+                            </th>
+
+                            <th class="col-status">
+                                Status
+                            </th>
+
+                            <th class="col-date">
+                                Next Visit Date
+                            </th>
+
+                            <th class="col-selection">
+                                Selection Made
+                            </th>
+
+                            <th class="col-discussion">
+                                Discussion
+                            </th>
+
+                            <th class="col-products">
+                                Products Pitched
+                            </th>
+
+                            <th class="col-photo">
+                                Visit Photo
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        ${rows.map((row, index) => `
+
+                            <tr>
+
+                                <!-- SR -->
+
+                                <td class="col-sr">
+                                    ${index + 1}
+                                </td>
+
+
+                                <!-- SUB LEAD -->
+
+                                <td class="col-name">
+
+                                    <div class="sub-lead-name-cell">
+
+                                        <strong>
+                                            ${escapeHtml(row.name || "-")}
+                                        </strong>
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- PURPOSE -->
+
+                                <td class="col-purpose">
+
+                                    <div class="table-text">
+                                        ${escapeHtml(
+                    row.purpose || "-"
+                )}
+                                    </div>
+
+                                </td>
+
+
+                                <!-- STATUS -->
+
+                                <td class="col-status">
+
+                                    <span class="status-badge">
+                                        ${escapeHtml(
+                    row.status || "-"
+                )}
+                                    </span>
+
+                                </td>
+
+
+                                <!-- NEXT VISIT -->
+
+                                <td class="col-date">
+
+                                    ${escapeHtml(
+                    row.next_visit_date || "-"
+                )}
+
+                                </td>
+
+
+                                <!-- SELECTION -->
+
+                                <td class="col-selection">
+
+                                    ${escapeHtml(
+                    row.selection_made || "-"
+                )}
+
+                                </td>
+
+
+                                <!-- DISCUSSION -->
+
+                                <td class="col-discussion">
+
+                                    <div class="table-text wrap-text">
+
+                                        ${escapeHtml(
+                    row.discussion || "-"
+                )}
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- PRODUCTS -->
+
+                                <td class="col-products">
+
+                                    <div class="table-text wrap-text">
+
+                                        ${escapeHtml(
+                    row.products_pitched || "-"
+                )}
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- PHOTO -->
+
+                                <td class="col-photo">
+
+                                    ${row.visit_photo
+
+                        ? `
+                                            <button
+                                                type="button"
+                                                class="detail-photo"
+                                                onclick="openDVRPhoto('${escapeHtml(row.visit_photo)}')"
+                                            >
+                                                🖼 View
+                                            </button>
+                                        `
+
+                        : `
+                                            <span class="no-photo">
+                                                -
+                                            </span>
+                                        `
+                    }
+
+                                </td>
+
+                            </tr>
+
+                        `).join("")}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        `;
+            })
+
+            .catch(error => {
+
+                console.error(
+                    "DVR Details API Error:",
+                    error
+                );
+
+                detailsBox.innerHTML = `
+            <div class="details-error">
+                Failed to load DVR details.
+            </div>
+        `;
+
+            });
+    }
+
+    let dvrData = [];
+
+    function loadDVRData() {
+
+        fetch("/api/method/gke_crm.api.dvr.get_dvr_for_approval_new_client", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+            .then(response => {
+
+                if (!response.ok) {
+                    throw new Error(`HTTP Error: ${response.status}`);
+                }
+
+                return response.json();
+
+            })
+            .then(data => {
+
+                console.log("DVR API Response:", data);
+
+                dvrData = data.message || [];
+
+                console.log("Live DVR Data:", dvrData);
+
+                renderApprovalDashboard();
+
+            })
+            .catch(error => {
+
+                console.error("DVR API Error:", error);
+
+                dvrData = [];
+
+                renderApprovalDashboard();
+
+            });
+
+    }
+
+
+    /* =========================================================
+       PAGE LOAD
+    ========================================================= */
+
+    document.addEventListener("DOMContentLoaded", function () {
+        loadDVRData();
+    });
+
+
+    /* =========================================================
+       RENDER APPROVAL DASHBOARD
+    ========================================================= */
+
+    function renderApprovalDashboard() {
+
+        const tbody = document.getElementById("approvalTable");
+        const empty = document.getElementById("approvalEmpty");
+
+        if (!tbody) return;
+
+        let data = [...dvrData];
+
+        const fromDate =
+            document.getElementById("approvalFrom")?.value || "";
+
+        const toDate =
+            document.getElementById("approvalTo")?.value || "";
+
+
+        if (fromDate) {
+
+            data = data.filter(row => {
+
+                if (!row.visit_date) return false;
+
+                const visitDate =
+                    String(row.visit_date).substring(0, 10);
+
+                return visitDate >= fromDate;
+
+            });
+
+        }
+
+
+        if (toDate) {
+
+            data = data.filter(row => {
+
+                if (!row.visit_date) return false;
+
+                const visitDate =
+                    String(row.visit_date).substring(0, 10);
+
+                return visitDate <= toDate;
+
+            });
+
+        }
+
+
+        tbody.innerHTML = "";
+
+
+        if (!data.length) {
+
+            empty.style.display = "block";
+
+            return;
+
+        }
+
+
+        empty.style.display = "none";
+
+
+        data.forEach(row => {
+
+            const tr = document.createElement("tr");
+
+            const isNewClient =
+                (row.client_type || "").trim() === "New Client";
+
+            const isEditable =
+                isNewClient && row.approval_status !== "Approved";
+
+            const actionCell = isEditable
+                ? `
+                        <button
+                            class="edit-btn"
+                            type="button"
+                            onclick="editDVR('${escapeHtml(row.name)}')"
+                        >
+                            ✎ Edit
+                        </button>
+                    `
+                : `<span class="action-empty">-</span>`;
+
+
+            const detailsCell = isEditable
+                ? `
+                        <button
+                            class="details-btn"
+                            type="button"
+                            onclick="toggleDVRDetails('${escapeHtml(row.name)}', this)"
+                        >
+                            ▼ View Details
+                        </button>
+                    `
+                : `<span class="action-empty">-</span>`;
+            tr.innerHTML = `
+        <td>
+            ${escapeHtml(row.sales_person || "-")}
+        </td>
+
+        <td>
+            ${escapeHtml(row.branch || "-")}
+        </td>
+
+        <td>
+            ${escapeHtml(
+                row.client_type === "New Client"
+                    ? row.party_name || "-"
+                    : row.client || "-"
+            )}
+        </td>
+
+        <td>
+            ${escapeHtml(row.visit_type || "-")}
+        </td>
+
+        <td>
+            ${escapeHtml(
+                row.visit_date
+                    ? String(row.visit_date).substring(0, 10)
+                    : "-"
+            )}
+        </td>
+
+        <td>
+            ${escapeHtml(
+                row.purpose_status ||
+                row.purpose ||
+                "-"
+            )}
+        </td>
+
+        <td>
+            ${row.visit_photo
+                    ? `
+                        <button
+                            class="photo-btn"
+                            type="button"
+                            onclick="viewPhoto('${escapeHtml(row.name)}')"
+                        >
+                            View Photo
+                        </button>
+                    `
+                    : "-"
+                }
+        </td>
+
+        
+
+        <td>
+            ${escapeHtml(row.sales_gm || "-")}
+        </td>
+
+        <td>
+            ${escapeHtml(row.creation || "-")}
+        </td>
+
+        <td>
+            ${escapeHtml(row.client_type || "-")}
+        </td>
+
+        <td>
+            ${getStatusBadge(row.approval_status)}
+        </td>
+
+        <td>
+            ${detailsCell}
+        </td>
+
+        <td>
+            ${actionCell}
+        </td>
+    `;
+
+
+            tbody.appendChild(tr);
+
+
+            /* =================================
+               DETAILS ROW
+            ================================= */
+
+            const detailsRow = document.createElement("tr");
+
+            detailsRow.className = "dvr-details-row";
+
+            detailsRow.id =
+                `dvr-details-row-${row.name}`;
+
+
+            detailsRow.innerHTML = `
+                <td
+                    colspan="14"
+                    class="dvr-details-wrapper"
+                >
+                    <div
+                        class="dvr-details-card"
+                        id="dvr-details-${row.name}"
+                    >
+                        <div class="details-loading">
+                            Loading...
+                        </div>
+                    </div>
+                </td>
+            `;
+
+            tbody.appendChild(detailsRow);
+
+        });
+    }
+
+
+    /* =========================================================
+       STATUS BADGE
+    ========================================================= */
+
+    function getStatusBadge(status) {
+
+        if (status === "Approved") {
+
+            return `
+            <span class="status status-approved">
+                Approved
+            </span>
+        `;
+
+        }
+
+
+        if (status === "Rejected") {
+
+            return `
+            <span class="status status-rejected">
+                Rejected
+            </span>
+        `;
+
+        }
+
+
+        return `
+        <span class="status status-pending">
+            Pending Approval
+        </span>
+    `;
+
+    }
+
+
+    /* =========================================================
+       EDIT DVR (New Client rows -> redirect to doctype form)
+    ========================================================= */
+
+    async function editDVR(name) {
+
+        if (!name) return;
+
+        try {
+
+            // 1. Parent DVR fetch
+            const dvrResponse = await fetch(
+                `/api/resource/Daily%20Visit%20Report/${encodeURIComponent(name)}`,
+                {
+                    method: "GET",
+                    credentials: "include",
+                    headers: {
+                        "Accept": "application/json"
+                    }
+                }
+            );
+
+            const dvrResult = await dvrResponse.json();
+
+            if (!dvrResponse.ok || !dvrResult.data) {
+                throw new Error(
+                    dvrResult.exception || "DVR record not found"
+                );
+            }
+
+            const dvr = dvrResult.data;
+
+            console.log("Parent DVR:", dvr);
+
+
+            // 2. Data from Parent DVR
+            const params = new URLSearchParams();
+
+            params.append("purpose", dvr.purpose || "");
+            params.append("status", dvr.status || "");
+            params.append("selection_made", dvr.selection_made || "");
+            params.append("visit_photo", dvr.visit_photo || "");
+            params.append("discussion", dvr.discussion || "");
+            params.append("products_pitched", dvr.products_pitched || "");
+            params.append("next_visit_date", dvr.next_visit_date || "");
+
+            // Parent DVR name
+            params.append(
+                "parent_lead_id",
+                dvr.parent_lead_id || name
+            );
+
+            params.append(
+                "amended_from",
+                name
+            );
+
+
+            console.log(
+                "Creating NEW Sub Lead:",
+                Object.fromEntries(params)
+            );
+
+
+            // 3. ALWAYS CREATE NEW SUB LEAD
+            const createResponse = await fetch(
+                `/api/method/gke_crm.api.dvr.create_dvr_record?${params.toString()}`,
+                {
+                    method: "GET",
+                    credentials: "include",
+                    headers: {
+                        "Accept": "application/json"
+                    }
+                }
+            );
+
+            const createResult =
+                await createResponse.json();
+
+            console.log(
+                "Sub Lead Response:",
+                createResult
+            );
+
+
+            if (
+                !createResponse.ok ||
+                !createResult.message
+            ) {
+
+                throw new Error(
+                    createResult.exception ||
+                    createResult.message ||
+                    "Sub Lead creation failed"
+                );
+            }
+
+
+            // 4. Newly created Sub Lead
+            const subLead = createResult.message;
+
+            console.log(
+                "New Sub Lead:",
+                subLead
+            );
+
+
+            // 5. Open NEW Sub Lead
+            window.location.href =
+                "/app/sub-lead/" +
+                encodeURIComponent(subLead.name);
+
+        }
+        catch (error) {
+
+            console.error(
+                "Edit DVR Error:",
+                error
+            );
+
+            alert(
+                error.message ||
+                "Something went wrong"
+            );
+        }
+    }
+
+    /* =========================================================
+       VIEW PHOTO
+    ========================================================= */
+
+    function viewPhoto(name) {
+
+        frappe.msgprint(
+            `Photo preview for ${name}`
+        );
+
+    }
+
+
+    /* =========================================================
+       CLEAR APPROVAL FILTERS
+    ========================================================= */
+
+    function clearApprovalFilters() {
+
+        const fromDate =
+            document.getElementById("approvalFrom");
+
+        const toDate =
+            document.getElementById("approvalTo");
+
+
+        if (fromDate) {
+            fromDate.value = "";
+        }
+
+        if (toDate) {
+            toDate.value = "";
+        }
+
+
+        renderApprovalDashboard();
+
+    }
+
+
+    /* =========================================================
+       ESCAPE HTML
+    ========================================================= */
+
+    function escapeHtml(value) {
+
+        if (
+            value === null ||
+            value === undefined
+        ) {
+            return "";
+        }
+
+
+        return String(value)
+
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+    }
+
+</script>

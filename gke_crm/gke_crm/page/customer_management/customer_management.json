@@ -1,0 +1,8 @@
+{
+  "doctype": "Page",
+  "module": "gke_crm",
+  "name": "customer-management",
+  "page_name": "customer-management",
+  "standard": "Yes",
+  "title": "Customer Management"
+}

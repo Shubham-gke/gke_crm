@@ -1,0 +1,3202 @@
+<div class="page" id="approvalPage">
+
+    <div class="card">
+
+        <!-- HEADER -->
+        <div class="card-header">
+            <h2>Approval Dashboard</h2>
+            <div class="sub" id="approvalSub">
+                Visits pending your review
+            </div>
+        </div>
+
+
+        <!-- MISSED / OVERDUE FOLLOW UPS -->
+        <div class="section" id="missedFollowUpsSection" style="display:none;">
+
+            <div class="section-title">
+                Missed / Overdue Follow-Ups
+            </div>
+
+            <div class="hint" style="margin-bottom:12px;">
+                Follow-ups due today or earlier across your reporting team
+                that have not yet been logged with a new visit. Use the date
+                range below to widen or narrow the follow-up window.
+            </div>
+
+            <div class="filter-bar" style="padding:0 0 16px 0;background:transparent;border-bottom:none;">
+
+                <div class="fitem">
+                    <label>Follow-up From</label>
+                    <input type="date" id="missedFollowUpFrom" onchange="renderMissedFollowUps()">
+                </div>
+
+                <div class="fitem">
+                    <label>Follow-up To</label>
+                    <input type="date" id="missedFollowUpTo" onchange="renderMissedFollowUps()">
+                </div>
+
+                <div class="fitem">
+                    <button class="secondary small" type="button" onclick="clearMissedFollowUpFilters()">
+                        Clear Filters
+                    </button>
+                </div>
+
+            </div>
+
+
+            <div class="table-wrap">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>Visit Date</th>
+                            <th>Client</th>
+                            <th>Client Type</th>
+                            <th>Executive</th>
+                            <th>Branch</th>
+                            <th>Follow-up Action</th>
+                            <th>Approval Status</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="missedFollowUpTable"></tbody>
+
+                </table>
+
+            </div>
+
+
+            <div class="empty-state" id="missedFollowUpEmpty" style="display:none;">
+                No missed or overdue follow-ups. 🎉
+            </div>
+
+        </div>
+
+
+        <!-- FILTER BAR -->
+        <div class="filter-bar" id="approvalFilterBar">
+
+            <div class="fitem" id="approvalClientTypeWrap">
+
+                <label>Client Type</label>
+
+                <select id="approvalClientType" onchange="onApprovalClientTypeChange()">
+
+                    <option value="">
+                        All (Existing + New)
+                    </option>
+
+                    <option value="Existing Client">
+                        Existing Clients
+                    </option>
+
+                    <option value="New Client">
+                        New Clients
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="fitem" id="approvalClientFilterWrap">
+
+                <label>Client</label>
+
+                <select id="approvalClientFilter" onchange="renderApprovalDashboard()">
+
+                    <option value="">
+                        All Clients
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="fitem">
+
+                <label>From Date</label>
+
+                <input type="date" id="approvalFrom" onchange="renderApprovalDashboard()">
+
+            </div>
+
+
+            <div class="fitem">
+
+                <label>To Date</label>
+
+                <input type="date" id="approvalTo" onchange="renderApprovalDashboard()">
+
+            </div>
+
+
+            <div class="fitem">
+
+                <button class="secondary small" type="button" onclick="clearApprovalFilters()">
+                    Clear Filters
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- CLIENT DETAILS -->
+        <div class="section client-detail-card" id="clientDetailSection" style="display:none;">
+
+            <div class="section-title">
+                Client Details
+            </div>
+
+            <div class="grid" id="clientDetailGrid"></div>
+
+        </div>
+
+
+        <!-- APPROVAL TABLE -->
+        <div class="section" id="approvalSection">
+
+            <div class="table-wrap">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Executive</th>
+                            <th>Branch</th>
+                            <th>Client</th>
+                            <th>Visit Type</th>
+                            <th>Party Name</th>
+                            <th>Visit Date</th>
+                            <th>Purpose / Status</th>
+                            <th>Photo</th>
+                            <th>Sales (gm)</th>
+                            <th>Submitted</th>
+                            <th>Approval Status</th>
+                            <th>Approved / Rejected By</th>
+                            <th>Client Type</th>
+                            <th>Manager Remarks</th>
+
+
+                            <!-- UPDATED -->
+                            <th style="min-width:300px;">
+                                Actions
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="approvalTable"></tbody>
+
+                </table>
+
+            </div>
+
+
+            <div class="empty-state" id="approvalEmpty" style="display:none;">
+                No visit records to display yet.
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<style>
+
+    /* =========================================
+       BLACK & WHITE DESIGN TOKENS
+    ========================================= */
+
+    #approvalPage {
+        --primary: #000000;
+        --primary-dark: #000000;
+        --primary-light: #f5f5f5;
+
+        --purple: #000000;
+        --purple-light: #f5f5f5;
+
+        --success: #000000;
+        --success-light: #f2f2f2;
+
+        --warning: #000000;
+        --warning-light: #f5f5f5;
+
+        --danger: #000000;
+        --danger-light: #f2f2f2;
+
+        --cyan: #000000;
+        --cyan-light: #f5f5f5;
+
+        --text: #111111;
+        --muted: #666666;
+
+        --border: #d6d6d6;
+        --bg: #f3f3f3;
+        --white: #ffffff;
+
+        --radius: 12px;
+
+        min-height: 100vh;
+
+        padding: 24px;
+
+        background: #f3f3f3;
+
+        color: #111111;
+
+        font-family:
+            Inter,
+            -apple-system,
+            BlinkMacSystemFont,
+            "Segoe UI",
+            sans-serif;
+    }
+
+
+    #approvalPage * {
+        box-sizing: border-box;
+    }
+
+
+    /* =========================================================
+       MAIN CARD
+    ========================================================= */
+
+    #approvalPage .card {
+        background: #ffffff;
+
+        border: 1px solid #d5d5d5;
+
+        border-radius: 18px;
+
+        overflow: hidden;
+
+        box-shadow:
+            0 8px 25px rgba(0, 0, 0, 0.08),
+            0 2px 6px rgba(0, 0, 0, 0.04);
+    }
+
+
+    /* =========================================================
+       HEADER
+    ========================================================= */
+
+    #approvalPage .card-header {
+        position: relative;
+
+        padding: 24px 28px;
+
+        color: #ffffff;
+
+        border: none;
+
+        background: #000000;
+
+        overflow: hidden;
+    }
+
+
+    #approvalPage .card-header::before {
+        content: "";
+
+        position: absolute;
+
+        width: 180px;
+        height: 180px;
+
+        right: -50px;
+        top: -90px;
+
+        border-radius: 50%;
+
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+
+    #approvalPage .card-header::after {
+        content: "";
+
+        position: absolute;
+
+        width: 120px;
+        height: 120px;
+
+        right: 120px;
+        bottom: -80px;
+
+        border-radius: 50%;
+
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+
+    #approvalPage .card-header h2 {
+        position: relative;
+
+        z-index: 2;
+
+        margin: 0;
+
+        font-size: 20px;
+
+        font-weight: 700;
+
+        color: #ffffff;
+
+        letter-spacing: -0.2px;
+    }
+
+
+    #approvalPage .sub {
+        position: relative;
+
+        z-index: 2;
+
+        margin-top: 5px;
+
+        font-size: 13px;
+
+        color: #d0d0d0;
+    }
+
+
+    /* =========================================================
+       SECTIONS
+    ========================================================= */
+
+    #approvalPage .section {
+        padding: 24px;
+
+        border-bottom: 1px solid #e0e0e0;
+
+        background: #ffffff;
+    }
+
+
+    #approvalPage .section:last-child {
+        border-bottom: none;
+    }
+
+
+    /* =========================================================
+       SECTION TITLE
+    ========================================================= */
+
+    #approvalPage .section-title {
+        display: flex;
+
+        align-items: center;
+
+        gap: 10px;
+
+        margin-bottom: 16px;
+
+        color: #111111;
+
+        font-size: 13px;
+
+        font-weight: 800;
+
+        text-transform: uppercase;
+
+        letter-spacing: 0.7px;
+    }
+
+
+    #approvalPage .section-title::before {
+        content: "";
+
+        width: 4px;
+        height: 18px;
+
+        border-radius: 10px;
+
+        background: #000000;
+    }
+
+
+    /* =========================================================
+       HINT
+    ========================================================= */
+
+    #approvalPage .hint {
+        padding: 12px 14px;
+
+        border-radius: 10px;
+
+        color: #555555;
+
+        background: #f7f7f7;
+
+        border: 1px solid #dddddd;
+
+        font-size: 12px;
+
+        line-height: 1.5;
+    }
+
+
+    /* =========================================================
+       FILTER BAR
+    ========================================================= */
+
+    #approvalPage .filter-bar {
+        display: flex;
+
+        flex-wrap: wrap;
+
+        gap: 16px;
+
+        align-items: flex-end;
+
+        padding: 22px 24px;
+
+        background: #f5f5f5;
+
+        border-top: 1px solid #dddddd;
+
+        border-bottom: 1px solid #dddddd;
+    }
+
+
+    #approvalPage .fitem {
+        display: flex;
+
+        flex-direction: column;
+
+        gap: 7px;
+
+        min-width: 175px;
+
+        flex: 1;
+    }
+
+
+    #approvalPage .fitem label {
+        color: #333333;
+
+        font-size: 12px;
+
+        font-weight: 700;
+
+        letter-spacing: 0.2px;
+    }
+
+
+    /* =========================================================
+       INPUTS
+    ========================================================= */
+
+    #approvalPage select,
+    #approvalPage input[type="date"],
+    #approvalPage input[type="text"] {
+
+        width: 100%;
+
+        height: 40px;
+
+        padding: 0 12px;
+
+        color: #111111;
+
+        background: #ffffff;
+
+        border: 1px solid #cccccc;
+
+        border-radius: 9px;
+
+        font-size: 13px;
+
+        transition:
+            border-color .2s ease,
+            box-shadow .2s ease,
+            transform .2s ease;
+    }
+
+
+    #approvalPage select:hover,
+    #approvalPage input[type="date"]:hover,
+    #approvalPage input[type="text"]:hover {
+        border-color: #777777;
+    }
+
+
+    #approvalPage select:focus,
+    #approvalPage input[type="date"]:focus,
+    #approvalPage input[type="text"]:focus {
+
+        outline: none;
+
+        border-color: #000000;
+
+        box-shadow:
+            0 0 0 3px rgba(0, 0, 0, 0.08);
+
+        transform: translateY(-1px);
+    }
+
+
+    /* =========================================================
+       BUTTONS
+    ========================================================= */
+
+    #approvalPage button {
+        cursor: pointer;
+
+        border-radius: 9px;
+
+        font-size: 12px;
+
+        font-weight: 700;
+
+        transition:
+            all .2s ease;
+    }
+
+
+    #approvalPage button:hover {
+        transform: translateY(-1px);
+    }
+
+
+    #approvalPage .secondary {
+
+        height: 40px;
+
+        padding: 0 16px;
+
+        color: #000000;
+
+        background: #ffffff;
+
+        border: 1px solid #999999;
+
+        box-shadow: none;
+    }
+
+
+    #approvalPage .secondary:hover {
+
+        color: #ffffff;
+
+        background: #000000;
+
+        border-color: #000000;
+
+        box-shadow:
+            0 5px 12px rgba(0, 0, 0, 0.15);
+    }
+
+
+    #approvalPage .small {
+        padding: 7px 14px;
+
+        font-size: 12px;
+    }
+
+
+    /* =========================================================
+       TABLE CONTAINER
+    ========================================================= */
+
+    #approvalPage .table-wrap {
+
+        width: 100%;
+
+        overflow-x: auto;
+
+        border: 1px solid #d5d5d5;
+
+        border-radius: 14px;
+
+        background: #ffffff;
+
+        box-shadow:
+            0 4px 12px rgba(0, 0, 0, 0.04);
+    }
+
+
+    /* =========================================================
+       TABLE
+    ========================================================= */
+
+    #approvalPage table {
+
+        width: 100%;
+
+        min-width: 1550px;
+
+        border-collapse: separate;
+
+        border-spacing: 0;
+
+        font-size: 12.5px;
+    }
+
+
+    /* =========================================================
+       TABLE HEADER
+    ========================================================= */
+
+    #approvalPage th {
+
+        padding: 13px 14px;
+
+        color: #ffffff;
+
+        background: #000000;
+
+        border: none;
+
+        font-size: 11.5px;
+
+        font-weight: 700;
+
+        text-align: left;
+
+        white-space: nowrap;
+    }
+
+
+    #approvalPage th:first-child {
+        border-top-left-radius: 12px;
+    }
+
+
+    #approvalPage th:last-child {
+        border-top-right-radius: 12px;
+    }
+
+
+    /* =========================================================
+       TABLE BODY
+    ========================================================= */
+
+    #approvalPage td {
+
+        padding: 12px 14px;
+
+        color: #222222;
+
+        background: #ffffff;
+
+        border-bottom: 1px solid #e5e5e5;
+
+        vertical-align: middle;
+
+        transition: background .15s ease;
+    }
+
+
+    #approvalPage tbody tr:nth-child(even) td {
+        background: #f7f7f7;
+    }
+
+
+    #approvalPage tbody tr:hover td {
+        background: #eeeeee;
+    }
+
+
+    /* =========================================================
+       STATUS BADGES
+    ========================================================= */
+
+    #approvalPage .status {
+
+        display: inline-flex;
+
+        align-items: center;
+
+        gap: 6px;
+
+        padding: 5px 11px;
+
+        border-radius: 30px;
+
+        font-size: 10.5px;
+
+        font-weight: 800;
+
+        letter-spacing: .2px;
+
+        white-space: nowrap;
+    }
+
+
+    #approvalPage .status::before {
+        content: "";
+
+        width: 6px;
+        height: 6px;
+
+        border-radius: 50%;
+
+        background: currentColor;
+    }
+
+
+    #approvalPage .status-pending {
+
+        color: #333333;
+
+        background: #f3f3f3;
+
+        border: 1px solid #aaaaaa;
+    }
+
+
+    #approvalPage .status-approved {
+
+        color: #000000;
+
+        background: #e9e9e9;
+
+        border: 1px solid #888888;
+    }
+
+
+    #approvalPage .status-rejected {
+
+        color: #222222;
+
+        background: #dddddd;
+
+        border: 1px solid #888888;
+    }
+
+
+    /* =========================================================
+       PHOTO BUTTON
+    ========================================================= */
+
+    #approvalPage .photo-btn {
+
+        padding: 7px 11px;
+
+        color: #000000;
+
+        background: #ffffff;
+
+        border: 1px solid #999999;
+
+        border-radius: 8px;
+
+        font-size: 11px;
+
+        font-weight: 700;
+    }
+
+
+    #approvalPage .photo-btn:hover {
+
+        color: #ffffff;
+
+        background: #000000;
+
+        border-color: #000000;
+
+        box-shadow: none;
+    }
+
+
+    /* =========================================================
+       ACTION BOX
+    ========================================================= */
+
+    #approvalPage .action-box {
+
+        display: flex;
+
+        flex-direction: column;
+
+        gap: 9px;
+
+        min-width: 280px;
+
+        padding: 10px;
+
+        border-radius: 10px;
+
+        background: #f5f5f5;
+
+        border: 1px solid #dddddd;
+    }
+
+
+    /* =========================================================
+       APPROVE / REJECT
+    ========================================================= */
+
+    #approvalPage .action-buttons {
+
+        display: flex;
+
+        gap: 8px;
+    }
+
+
+    #approvalPage .btn-approve,
+    #approvalPage .btn-reject {
+
+        border: 1px solid #000000;
+
+        color: #ffffff;
+
+        background: #000000;
+
+        padding: 7px 15px;
+
+        font-size: 11.5px;
+
+        font-weight: 700;
+
+        border-radius: 8px;
+
+        box-shadow:
+            0 3px 7px rgba(0, 0, 0, .08);
+    }
+
+
+    #approvalPage .btn-approve:hover,
+    #approvalPage .btn-reject:hover {
+
+        color: #000000;
+
+        background: #ffffff;
+
+        border-color: #000000;
+
+        box-shadow: none;
+    }
+
+
+    /* =========================================================
+       REVIEW
+    ========================================================= */
+
+    #approvalPage .review-row {
+
+        display: flex;
+
+        align-items: center;
+    }
+
+
+    #approvalPage .review-label {
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 8px;
+
+        padding: 6px 9px;
+
+        border-radius: 7px;
+
+        color: #333333;
+
+        background: #ffffff;
+
+        border: 1px solid #cccccc;
+
+        font-size: 11.5px;
+
+        cursor: pointer;
+    }
+
+
+    #approvalPage .review-label:hover {
+        background: #f2f2f2;
+
+        border-color: #999999;
+    }
+
+
+    #approvalPage .review-label input[type="checkbox"] {
+
+        width: 15px;
+
+        height: 15px;
+
+        cursor: pointer;
+
+        accent-color: #000000;
+    }
+
+
+    #approvalPage input[type="checkbox"] {
+        accent-color: #000000;
+    }
+
+
+    /* =========================================================
+       REMARK
+    ========================================================= */
+
+    #approvalPage .remark-row {
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 8px;
+    }
+
+
+    #approvalPage .remark-row input {
+
+        flex: 1;
+
+        width: auto;
+
+        height: 32px;
+
+        padding: 0 10px;
+
+        border: 1px solid #cccccc;
+
+        border-radius: 7px;
+
+        font-size: 11.5px;
+    }
+
+
+    #approvalPage .remark-row input:focus {
+
+        outline: none;
+
+        border-color: #000000;
+
+        box-shadow:
+            0 0 0 3px rgba(0, 0, 0, .08);
+    }
+
+
+    /* =========================================================
+       SAVE
+    ========================================================= */
+
+    #approvalPage .btn-save {
+
+        height: 32px;
+
+        padding: 0 13px;
+
+        border: 1px solid #000000;
+
+        color: #ffffff;
+
+        background: #000000;
+
+        font-size: 11px;
+
+        font-weight: 700;
+
+        border-radius: 7px;
+
+        box-shadow:
+            0 3px 8px rgba(0, 0, 0, .15);
+    }
+
+
+    #approvalPage .btn-save:hover {
+
+        color: #000000;
+
+        background: #ffffff;
+
+        border-color: #000000;
+
+        box-shadow: none;
+    }
+
+
+    /* =========================================================
+       CLIENT DETAILS
+    ========================================================= */
+
+    #approvalPage .grid {
+
+        display: grid;
+
+        grid-template-columns:
+            repeat(auto-fit,
+                minmax(190px, 1fr));
+
+        gap: 14px;
+    }
+
+
+    #approvalPage .detail-item {
+
+        position: relative;
+
+        padding: 16px;
+
+        background: #ffffff;
+
+        border: 1px solid #dddddd;
+
+        border-radius: 12px;
+
+        overflow: hidden;
+
+        box-shadow:
+            0 3px 8px rgba(0, 0, 0, .04);
+
+        transition: all .2s ease;
+    }
+
+
+    #approvalPage .detail-item::before {
+
+        content: "";
+
+        position: absolute;
+
+        left: 0;
+        top: 0;
+        bottom: 0;
+
+        width: 4px;
+
+        background: #000000;
+    }
+
+
+    #approvalPage .detail-item:hover {
+
+        transform: translateY(-2px);
+
+        box-shadow:
+            0 8px 18px rgba(0, 0, 0, .08);
+    }
+
+
+    #approvalPage .detail-label {
+
+        margin-bottom: 6px;
+
+        color: #777777;
+
+        font-size: 10px;
+
+        font-weight: 700;
+
+        text-transform: uppercase;
+
+        letter-spacing: .6px;
+    }
+
+
+    #approvalPage .detail-value {
+
+        color: #111111;
+
+        font-size: 14px;
+
+        font-weight: 700;
+    }
+
+
+    /* =========================================================
+       MISSED FOLLOW-UP SECTION
+    ========================================================= */
+
+    #approvalPage #missedFollowUpsSection {
+
+        background: #f5f5f5;
+
+        border-left: 4px solid #000000;
+    }
+
+
+    #approvalPage #missedFollowUpsSection .section-title {
+        color: #111111;
+    }
+
+
+    #approvalPage #missedFollowUpsSection .section-title::before {
+        background: #000000;
+    }
+
+
+    /* =========================================================
+       EMPTY STATE
+    ========================================================= */
+
+    #approvalPage .empty-state {
+
+        padding: 45px 20px;
+
+        text-align: center;
+
+        color: #777777;
+
+        font-size: 13px;
+
+        background: #fafafa;
+    }
+
+
+    /* =========================================================
+       ALERT
+    ========================================================= */
+
+    #dvrAlert {
+
+        border-radius: 12px !important;
+
+        padding: 13px 20px !important;
+
+        font-size: 13px !important;
+
+        font-weight: 600 !important;
+
+        box-shadow:
+            0 10px 30px rgba(0, 0, 0, .18) !important;
+    }
+
+
+    /* =========================================================
+       SCROLLBAR
+    ========================================================= */
+
+    #approvalPage .table-wrap::-webkit-scrollbar {
+        height: 8px;
+    }
+
+
+    #approvalPage .table-wrap::-webkit-scrollbar-track {
+        background: #eeeeee;
+
+        border-radius: 10px;
+    }
+
+
+    #approvalPage .table-wrap::-webkit-scrollbar-thumb {
+        background: #000000;
+
+        border-radius: 10px;
+    }
+
+
+    /* =========================================================
+       MOBILE
+    ========================================================= */
+
+    @media (max-width: 768px) {
+
+        #approvalPage {
+            padding: 10px;
+
+            background: #f3f3f3;
+        }
+
+
+        #approvalPage .card {
+            border-radius: 12px;
+        }
+
+
+        #approvalPage .card-header {
+            padding: 20px;
+        }
+
+
+        #approvalPage .section {
+            padding: 16px;
+        }
+
+
+        #approvalPage .filter-bar {
+            padding: 16px;
+
+            gap: 12px;
+        }
+
+
+        #approvalPage .fitem {
+            width: 100%;
+
+            min-width: 100%;
+
+            flex: none;
+        }
+
+
+        #approvalPage select,
+        #approvalPage input[type="date"],
+        #approvalPage input[type="text"] {
+            width: 100%;
+        }
+
+
+        #approvalPage .action-box {
+            min-width: 250px;
+        }
+
+    }
+
+</style>
+```
+
+
+
+<script>
+
+    /* =========================================================
+       DUMMY DATA
+    ========================================================= */
+
+    // let dummyDVRData = [
+
+    //     {
+    //         name: "DVR-0001",
+
+    //         executive: "Rahul Sharma",
+
+    //         branch: "Mumbai",
+
+    //         client: "ABC Jewellers",
+
+    //         client_type: "Existing Client",
+
+    //         visit_type: "Follow-up",
+
+    //         purpose_status: "Order Discussion",
+
+    //         photo: true,
+
+    //         sales_gm: 125.50,
+
+    //         visit_date: "2026-09-02",
+
+    //         submitted: "2026-09-02 10:30",
+
+    //         follow_up_date: "2026-09-05",
+
+    //         approval_status: "Pending Approval",
+
+    //         approved_by: "",
+
+    //         manager_remarks: "",
+
+    //         reviewed: false
+    //     },
+
+
+    //     {
+    //         name: "DVR-0002",
+
+    //         executive: "Amit Patel",
+
+    //         branch: "Surat",
+
+    //         client: "XYZ Gold Palace",
+
+    //         client_type: "New Client",
+
+    //         visit_type: "New Lead",
+
+    //         purpose_status: "New Business Discussion",
+
+    //         photo: true,
+
+    //         sales_gm: 250.75,
+
+    //         visit_date: "2026-09-01",
+
+    //         submitted: "2026-09-01 14:20",
+
+    //         follow_up_date: "2026-09-04",
+
+    //         approval_status: "Pending Approval",
+
+    //         approved_by: "",
+
+    //         manager_remarks: "",
+
+    //         reviewed: false
+    //     },
+
+
+    //     {
+    //         name: "DVR-0003",
+
+    //         executive: "Vikas Shah",
+
+    //         branch: "Ahmedabad",
+
+    //         client: "PQR Diamonds",
+
+    //         client_type: "Existing Client",
+
+    //         visit_type: "Regular Visit",
+
+    //         purpose_status: "Order Follow-up",
+
+    //         photo: false,
+
+    //         sales_gm: 89.25,
+
+    //         visit_date: "2026-08-30",
+
+    //         submitted: "2026-08-30 16:15",
+
+    //         follow_up_date: "2026-09-03",
+
+    //         approval_status: "Approved",
+
+    //         approved_by: "Manager",
+
+    //         manager_remarks: "Good visit report",
+
+    //         reviewed: true
+    //     },
+
+
+    //     {
+    //         name: "DVR-0004",
+
+    //         executive: "Rohit Mehta",
+
+    //         branch: "Mumbai",
+
+    //         client: "LMN Jewellers",
+
+    //         client_type: "New Client",
+
+    //         visit_type: "New Lead",
+
+    //         purpose_status: "Product Presentation",
+
+    //         photo: true,
+
+    //         sales_gm: 175.00,
+
+    //         visit_date: "2026-08-29",
+
+    //         submitted: "2026-08-29 11:45",
+
+    //         follow_up_date: "2026-09-01",
+
+    //         approval_status: "Rejected",
+
+    //         approved_by: "Manager",
+
+    //         manager_remarks: "Please provide more details",
+
+    //         reviewed: true
+    //     },
+
+
+    //     {
+    //         name: "DVR-0005",
+
+    //         executive: "Rahul Sharma",
+
+    //         branch: "Mumbai",
+
+    //         client: "Star Gold",
+
+    //         client_type: "Existing Client",
+
+    //         visit_type: "Follow-up",
+
+    //         purpose_status: "Payment Discussion",
+
+    //         photo: true,
+
+    //         sales_gm: 65.50,
+
+    //         visit_date: "2026-09-02",
+
+    //         submitted: "2026-09-02 12:15",
+
+    //         follow_up_date: "2026-09-06",
+
+    //         approval_status: "Pending Approval",
+
+    //         approved_by: "",
+
+    //         manager_remarks: "",
+
+    //         reviewed: false
+    //     }
+
+    // ];
+    let dvrData = [];
+
+    function loadDVRData() {
+
+        fetch("/api/method/gke_crm.api.dvr.get_dvr_for_approval_new_client", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP Error: ${response.status}`);
+                }
+
+                return response.json();
+            })
+            .then(data => {
+
+                console.log("DVR API Response:", data);
+
+                dvrData = data.message || [];
+
+                console.log("Live DVR Data:", dvrData);
+
+                populateClientFilter();
+                renderApprovalDashboard();
+                renderMissedFollowUps();
+
+            })
+            .catch(error => {
+
+                console.error("DVR API Error:", error);
+
+                dvrData = [];
+
+                renderApprovalDashboard();
+                renderMissedFollowUps();
+
+            });
+    }
+    /* =========================================================
+       DUMMY FOLLOW UPS
+    ========================================================= */
+
+
+
+
+    /* =========================================================
+       PAGE LOAD
+    ========================================================= */
+
+    // document.addEventListener("DOMContentLoaded", function () {
+    //     loadDVRData();
+    // });
+
+    async function checkAccess() {
+        try {
+            const response = await fetch(
+                "/api/method/frappe.auth.get_logged_user"
+            );
+
+            const data = await response.json();
+
+            const loggedInUser = data.message;
+
+            console.log("Logged-in User:", loggedInUser);
+
+            // Sirf Administrator allowed
+            if (loggedInUser !== "Administrator") {
+                document.body.innerHTML = `
+                <div style="
+                    height: 100vh;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-family: Arial, sans-serif;
+                    background: #f8f9fa;
+                ">
+                    <div style="
+                        text-align: center;
+                        padding: 40px;
+                        background: white;
+                        border-radius: 12px;
+                        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+                    ">
+                        <h2 style="color: #dc3545; margin-bottom: 10px;">
+                            Access Denied
+                        </h2>
+
+                        <p style="color: #666; margin: 0;">
+                            Cannot be accessed by this user.
+                        </p>
+                    </div>
+                </div>
+            `;
+
+                return;
+            }
+
+            // Allowed user
+            document.getElementById("approvalPage").style.display = "block";
+
+            // Dashboard load karo
+            loadDVRData();
+
+        } catch (error) {
+            console.error("Access check failed:", error);
+
+            document.body.innerHTML = `
+            <div style="
+                height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-family: Arial, sans-serif;
+            ">
+                <h2 style="color: #dc3545;">
+                    Cannot be accessed
+                </h2>
+            </div>  
+        `;
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const page = document.getElementById("approvalPage");
+
+        if (page) {
+            page.style.display = "none";
+        }
+
+        checkAccess();
+    });
+
+
+    /* =========================================================
+       CLIENT FILTER
+    ========================================================= */
+
+
+    async function populateClientFilter(clientType = "") {
+
+        const select =
+            document.getElementById("approvalClientFilter");
+
+        const label =
+            document.getElementById("approvalClientFilterLabel");
+
+        if (!select) {
+            console.warn("approvalClientFilter not found");
+            return;
+        }
+
+
+        /* =====================================================
+           RESET
+        ===================================================== */
+
+        select.innerHTML = `
+        <option value="">
+            Loading...
+        </option>
+    `;
+
+
+        /* =====================================================
+           ALL
+           Existing + New
+        ===================================================== */
+
+        if (!clientType) {
+
+            if (label) {
+                label.textContent = "Client / Party";
+            }
+
+            select.innerHTML = `
+            <option value="">
+                All Clients
+            </option>
+        `;
+
+
+            /*
+             * Existing clients from DVR data
+             */
+            const existingClients =
+                dvrData
+                    .filter(row =>
+                        row.client_type === "Existing Client"
+                    )
+                    .map(row => row.client)
+                    .filter(Boolean);
+
+
+            /*
+             * New clients from DVR data
+             */
+            const newClients =
+                dvrData
+                    .filter(row =>
+                        row.client_type === "New Client"
+                    )
+                    .map(row =>
+                        row.party_name
+                    )
+                    .filter(Boolean);
+
+
+            /*
+             * Combine
+             */
+            const clients = [
+                ...new Set([
+                    ...existingClients,
+                    ...newClients
+                ])
+            ];
+
+
+            clients.forEach(client => {
+
+                const option =
+                    document.createElement("option");
+
+                option.value = client;
+
+                option.textContent = client;
+
+                select.appendChild(option);
+
+            });
+
+
+            return;
+        }
+
+
+        /* =====================================================
+           EXISTING CLIENT
+        ===================================================== */
+
+        if (clientType === "Existing Client") {
+
+            if (label) {
+                label.textContent = "Client Name";
+            }
+
+
+            select.innerHTML = `
+            <option value="">
+                Loading clients...
+            </option>
+        `;
+
+
+            try {
+
+                const response = await fetch(
+                    "/api/method/get_customer_from_gk",
+                    {
+                        method: "GET",
+                        credentials: "same-origin",
+                        headers: {
+                            "Accept": "application/json"
+                        }
+                    }
+                );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        `HTTP Error: ${response.status}`
+                    );
+
+                }
+
+
+                const data =
+                    await response.json();
+
+
+                console.log(
+                    "Existing Client API:",
+                    data
+                );
+
+
+                const customers =
+                    data.message || [];
+
+
+                select.innerHTML = `
+                <option value="">
+                    All Clients
+                </option>
+            `;
+
+
+                if (!Array.isArray(customers)) {
+                    return;
+                }
+
+
+                customers.forEach(row => {
+
+                    if (!row.name) {
+                        return;
+                    }
+
+
+                    const option =
+                        document.createElement("option");
+
+
+                    /*
+                     * IMPORTANT:
+                     *
+                     * DVR existing client me
+                     * row.client stored hai
+                     *
+                     * So value = customer code/name
+                     */
+
+                    option.value = row.name;
+
+
+                    option.textContent =
+                        `${row.name} - ${row.customer_name || ""}`;
+
+
+                    select.appendChild(option);
+
+                });
+
+
+                console.log(
+                    "Existing Clients Loaded:",
+                    customers.length
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Existing Client API Error:",
+                    error
+                );
+
+
+                select.innerHTML = `
+                <option value="">
+                    Failed to load clients
+                </option>
+            `;
+
+            }
+
+
+            return;
+        }
+
+
+        /* =====================================================
+           NEW CLIENT
+        ===================================================== */
+
+        if (clientType === "New Client") {
+
+            if (label) {
+                label.textContent = "Party Name";
+            }
+
+
+            select.innerHTML = `
+            <option value="">
+                Loading parties...
+            </option>
+        `;
+
+
+            try {
+
+                const response = await fetch(
+                    "/api/method/gke_crm.api.dvr.get_new_client_party_names",
+                    {
+                        method: "GET",
+                        credentials: "same-origin",
+                        headers: {
+                            "Accept": "application/json"
+                        }
+                    }
+                );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        `HTTP Error: ${response.status}`
+                    );
+
+                }
+
+
+                const data =
+                    await response.json();
+
+
+                console.log(
+                    "New Client API:",
+                    data
+                );
+
+
+                const parties =
+                    data.message || [];
+
+
+                select.innerHTML = `
+                <option value="">
+                    All New Clients
+                </option>
+            `;
+
+
+                if (!Array.isArray(parties)) {
+                    return;
+                }
+
+
+                parties.forEach(row => {
+
+                    let partyName = "";
+
+
+                    /*
+                     * API string return kare
+                     */
+
+                    if (typeof row === "string") {
+
+                        partyName = row;
+
+                    }
+
+
+                    /*
+                     * API object return kare
+                     */
+
+                    else {
+
+                        partyName =
+                            row.party_name ||
+                            row.client_name ||
+                            row.name ||
+                            "";
+
+                    }
+
+
+                    if (!partyName) {
+                        return;
+                    }
+
+
+                    const option =
+                        document.createElement("option");
+
+
+                    option.value = partyName;
+
+                    option.textContent = partyName;
+
+
+                    select.appendChild(option);
+
+                });
+
+
+                console.log(
+                    "New Client Parties Loaded:",
+                    parties.length
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "New Client API Error:",
+                    error
+                );
+
+
+                select.innerHTML = `
+                <option value="">
+                    Failed to load parties
+                </option>
+            `;
+
+            }
+
+
+            return;
+        }
+
+    }
+
+
+
+    /* =========================================================
+       CLIENT TYPE CHANGE
+    ========================================================= */
+
+    async function onApprovalClientTypeChange() {
+
+        const clientType =
+            document.getElementById("approvalClientType")?.value || "";
+
+
+        const clientSelect =
+            document.getElementById("approvalClientFilter");
+
+
+        if (!clientSelect) {
+            return;
+        }
+
+
+        /*
+         * Previous selected client clear
+         */
+
+        clientSelect.value = "";
+
+
+        /*
+         * Load new dropdown according to Client Type
+         */
+
+        await populateClientFilter(clientType);
+
+
+        /*
+         * Reset selection again
+         */
+
+        clientSelect.value = "";
+
+
+        /*
+         * Render filtered data
+         */
+
+        renderApprovalDashboard();
+
+    }
+
+
+    /* =========================================================
+       RENDER APPROVAL DASHBOARD
+    ========================================================= */
+
+    function renderApprovalDashboard() {
+
+        const tbody =
+            document.getElementById("approvalTable");
+
+        const empty =
+            document.getElementById("approvalEmpty");
+
+        if (!tbody) return;
+
+        let data = [...dvrData];
+
+        // const clientType =
+        //     document.getElementById("approvalClientType").value;
+
+        const client =
+            document.getElementById("approvalClientFilter")?.value || "";
+
+        const clientType =
+            document.getElementById("approvalClientType")?.value || "";
+
+        const fromDate =
+            document.getElementById("approvalFrom")?.value || "";
+
+        const toDate =
+            document.getElementById("approvalTo")?.value || "";
+
+
+        /* =========================================
+           CLIENT TYPE FILTER
+        ========================================= */
+
+        if (clientType) {
+
+            data = data.filter(
+                row =>
+                    row.client_type === clientType
+            );
+
+        }
+
+
+        /* =========================================
+           CLIENT FILTER
+        ========================================= */
+
+        if (client) {
+
+            data = data.filter(
+                row =>
+                    row.party_name === client
+            );
+
+        }
+
+
+        /* =========================================
+           FROM DATE
+        ========================================= */
+
+        if (fromDate) {
+
+            data = data.filter(
+                row =>
+                    row.visit_date &&
+                    row.visit_date >= fromDate
+            );
+
+        }
+
+
+        /* =========================================
+           TO DATE
+        ========================================= */
+
+        if (toDate) {
+
+            data = data.filter(
+                row =>
+                    row.visit_date &&
+                    row.visit_date <= toDate
+            );
+
+        }
+
+
+        tbody.innerHTML = "";
+
+
+        if (!data.length) {
+
+            empty.style.display = "block";
+
+            return;
+
+        }
+
+
+        empty.style.display = "none";
+
+
+        /* =========================================
+           RENDER LIVE DVR
+        ========================================= */
+
+        data.forEach(row => {
+
+            const tr =
+                document.createElement("tr");
+
+
+            tr.innerHTML = `
+
+            <td>
+                ${escapeHtml(row.sales_person || "-")}
+            </td>
+
+            <td>
+                ${escapeHtml(row.branch || "-")}
+            </td>
+
+            <td>
+                ${escapeHtml(row.client || "-")}
+            </td>
+
+            <td>
+                ${escapeHtml(row.visit_type || "-")}
+            </td>
+
+            <td>
+                ${escapeHtml(row.party_name || "-")}
+            </td>
+
+             <td>
+                ${escapeHtml(row.visit_date || "-")}
+            </td>
+
+            <td>
+                ${escapeHtml(row.purpose_status || "-")}
+            </td>
+
+            <td>
+
+                ${row.photo
+                    ?
+                    `<button
+                        class="photo-btn"
+                        type="button"
+                        onclick="viewPhoto('${row.name}')"
+                    >
+                        View Photo
+                    </button>`
+                    :
+                    "-"
+                }
+
+            </td>
+
+            <td>
+                ${escapeHtml(row.sales_gm || "-")}
+            </td>
+
+            <td>
+                ${escapeHtml(row.creation || "-")}
+            </td>
+
+            <td>
+                ${getStatusBadge(row.approval_status)}
+            </td>
+
+            <td>
+                ${escapeHtml(row.approved_by || "-")}
+            </td>
+
+            <td>
+                ${escapeHtml(row.client_type || "-")}
+            </td>
+
+            <td>
+                ${escapeHtml(row.manager_remarks || "-")}
+            </td>
+
+          
+
+            <td>
+                ${getActionHtml(row)}
+            </td>
+
+        `;
+
+
+            tbody.appendChild(tr);
+
+        });
+    }
+
+    /* =========================================================
+       ACTION HTML
+    ========================================================= */
+
+    function getActionHtml(row) {
+
+        return `
+
+        <div class="action-box">
+
+
+            <!-- APPROVE / REJECT -->
+
+            <div class="action-buttons">
+
+            ${row.client_type !== "Existing Client" && row.approval_status !== "Approved" ? `
+                <button
+                    class="btn-approve"
+                    type="button"
+                    onclick="approveDVR('${row.name}')"
+                >
+                    Approve
+                </button>
+            ` : ''}
+
+            ${!(
+                    row.client_type === "New Client" &&
+                    row.approval_status === "Approved"
+                ) && row.client_type !== "Existing Client" && row.approval_status !== "Rejected" ? `
+                    <button
+                        class="btn-reject"
+                        type="button"
+                        onclick="rejectDVR('${row.name}')"
+                    >
+                        Reject
+                    </button>
+                ` : ''}
+
+        </div>
+
+
+
+            ${row.client_type !== "Existing Client" ? `
+            <div class="remark-row">
+
+                <input
+                    type="text"
+                    id="remark_${row.name}"
+                    placeholder="Enter remark..."
+                    value="${escapeHtml(row.manager_remarks || "")}"
+                >
+
+                <button
+                    class="btn-save"
+                    type="button"
+                    onclick="saveReview('${row.name}')"
+                >
+                    Save
+                </button>
+
+            </div>
+        ` : ''}
+
+        </div>
+
+    `;
+
+    }
+
+
+    /* =========================================================
+       STATUS BADGE
+    ========================================================= */
+
+    function getStatusBadge(status) {
+
+        if (status === "Approved") {
+
+            return `
+            <span class="status status-approved">
+                Approved
+            </span>
+        `;
+
+        }
+
+
+        if (status === "Rejected") {
+
+            return `
+            <span class="status status-rejected">
+                Rejected
+            </span>
+        `;
+
+        }
+
+
+        return `
+        <span class="status status-pending">
+            Pending Approval
+        </span>
+    `;
+
+    }
+
+
+    /* =========================================================
+       APPROVE
+    ========================================================= */
+
+
+    function approveDVR(name) {
+
+        if (!name) {
+            showDVRAlert(
+                "DVR Name is required",
+                "red"
+            );
+            return;
+        }
+
+
+        const confirmed = confirm(
+            `Are you sure you want to approve DVR ${name}?`
+        );
+
+
+        if (!confirmed) {
+
+            showDVRAlert(
+                "Approval cancelled",
+                "orange"
+            );
+
+            return;
+        }
+
+
+        fetch(
+            `/api/method/gke_crm.api.dvr.update_dvr_status?name=${encodeURIComponent(name)}&status=Approved`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+        )
+            .then(response => {
+
+                return response.json().then(data => {
+
+                    if (!response.ok) {
+
+                        throw new Error(
+                            data.exception ||
+                            `HTTP Error: ${response.status}`
+                        );
+
+                    }
+
+                    return data;
+
+                });
+
+            })
+            .then(data => {
+
+                console.log(
+                    "Approve API Response:",
+                    data
+                );
+
+
+                if (
+                    data.message &&
+                    data.message.success
+                ) {
+
+                    // Local data update
+                    const row = dvrData.find(
+                        item => item.name === name
+                    );
+
+
+                    if (row) {
+
+                        row.approval_status = "Approved";
+
+                    }
+
+
+                    // Success message
+                    showDVRAlert(
+                        `DVR ${name} Approved Successfully`,
+                        "green"
+                    );
+
+
+                    // Dashboard refresh
+                    if (
+                        typeof renderApprovalDashboard ===
+                        "function"
+                    ) {
+
+                        renderApprovalDashboard();
+
+                    }
+
+
+                    // Follow-up refresh
+                    if (
+                        typeof renderMissedFollowUps ===
+                        "function"
+                    ) {
+
+                        renderMissedFollowUps();
+
+                    }
+
+                } else {
+
+                    showDVRAlert(
+                        "DVR approval failed",
+                        "red"
+                    );
+
+                }
+
+            })
+            .catch(error => {
+
+                console.error(
+                    "Approve DVR Error:",
+                    error
+                );
+
+
+                showDVRAlert(
+                    `Error: ${error.message}`,
+                    "red"
+                );
+
+            });
+
+    }
+
+
+    /* ================================
+       CUSTOM ALERT
+    ================================ */
+
+    function showDVRAlert(message, type) {
+
+        const oldAlert =
+            document.getElementById("dvrAlert");
+
+        if (oldAlert) {
+            oldAlert.remove();
+        }
+
+
+        const alert = document.createElement("div");
+
+        alert.id = "dvrAlert";
+
+        alert.innerHTML = message;
+
+
+        let background = "#198754";
+
+        if (type === "red") {
+            background = "#dc3545";
+        }
+
+        if (type === "orange") {
+            background = "#fd7e14";
+        }
+
+        if (type === "blue") {
+            background = "#0d6efd";
+        }
+
+
+        alert.style.position = "fixed";
+        alert.style.top = "20px";
+        alert.style.right = "20px";
+        alert.style.zIndex = "99999";
+
+        alert.style.background = background;
+        alert.style.color = "#fff";
+
+        alert.style.padding =
+            "12px 20px";
+
+        alert.style.borderRadius =
+            "6px";
+
+        alert.style.fontSize =
+            "14px";
+
+        alert.style.fontWeight =
+            "500";
+
+        alert.style.boxShadow =
+            "0 4px 12px rgba(0,0,0,0.2)";
+
+        alert.style.minWidth =
+            "250px";
+
+
+        document.body.appendChild(alert);
+
+
+        setTimeout(() => {
+
+            alert.remove();
+
+        }, 3000);
+
+    }
+
+
+    /* =========================================================
+       REJECT
+    ========================================================= */
+
+
+    function rejectDVR(name) {
+
+        if (!name) {
+            showDVRAlert(
+                "DVR Name is required",
+                "red"
+            );
+            return;
+        }
+
+
+        const confirmed = confirm(
+            `Are you sure you want to reject DVR ${name}?`
+        );
+
+
+        if (!confirmed) {
+
+            showDVRAlert(
+                "Rejection cancelled",
+                "orange"
+            );
+
+            return;
+        }
+
+
+        fetch(
+            `/api/method/gke_crm.api.dvr.update_dvr_status?name=${encodeURIComponent(name)}&status=Rejected`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+        )
+            .then(response => {
+
+                return response.json().then(data => {
+
+                    if (!response.ok) {
+
+                        throw new Error(
+                            data.exception ||
+                            `HTTP Error: ${response.status}`
+                        );
+
+                    }
+
+                    return data;
+
+                });
+
+            })
+            .then(data => {
+
+                console.log(
+                    "Reject API Response:",
+                    data
+                );
+
+
+                if (
+                    data.message &&
+                    data.message.success
+                ) {
+
+                    // Local data update
+                    const row = dvrData.find(
+                        item => item.name === name
+                    );
+
+
+                    if (row) {
+
+                        row.approval_status = "Rejected";
+
+                    }
+
+
+                    // Success message
+                    showDVRAlert(
+                        `DVR ${name} Rejected Successfully`,
+                        "red"
+                    );
+
+
+                    // Dashboard refresh
+                    if (
+                        typeof renderApprovalDashboard ===
+                        "function"
+                    ) {
+
+                        renderApprovalDashboard();
+
+                    }
+
+
+                    // Follow-up refresh
+                    if (
+                        typeof renderMissedFollowUps ===
+                        "function"
+                    ) {
+
+                        renderMissedFollowUps();
+
+                    }
+
+                } else {
+
+                    showDVRAlert(
+                        "DVR rejection failed",
+                        "red"
+                    );
+
+                }
+
+            })
+            .catch(error => {
+
+                console.error(
+                    "Reject DVR Error:",
+                    error
+                );
+
+
+                showDVRAlert(
+                    `Error: ${error.message}`,
+                    "red"
+                );
+
+            });
+
+    }
+
+
+
+
+    /* =========================================================
+       UPDATE REVIEWED
+    ========================================================= */
+
+    function updateReviewed(name) {
+
+        const checkbox =
+            document.getElementById(
+                `reviewed_${name}`
+            );
+
+
+        const row =
+            dvrData.find(
+                item =>
+                    item.name === name
+            );
+
+
+        if (!row || !checkbox) return;
+
+
+        const reviewed =
+            checkbox.checked ? 1 : 0;
+
+
+        fetch(
+            `/api/method/gke_crm.api.dvr.save_dvr_review?name=${encodeURIComponent(name)}&reviewed=${reviewed}`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+        )
+            .then(response => {
+
+                return response.json().then(data => {
+
+                    if (!response.ok) {
+
+                        throw new Error(
+                            data.exception ||
+                            `HTTP Error: ${response.status}`
+                        );
+
+                    }
+
+                    return data;
+
+                });
+
+            })
+            .then(data => {
+
+                console.log(
+                    "Review API Response:",
+                    data
+                );
+
+
+                if (
+                    data.message &&
+                    data.message.success
+                ) {
+
+                    // Local data update
+                    row.review =
+                        data.message.review;
+
+
+                    showDVRAlert(
+                        "Review status updated successfully",
+                        "green"
+                    );
+
+                } else {
+
+                    // API failed, checkbox previous state par
+                    checkbox.checked =
+                        !checkbox.checked;
+
+                    showDVRAlert(
+                        "Failed to update review status",
+                        "red"
+                    );
+
+                }
+
+            })
+            .catch(error => {
+
+                console.error(
+                    "Update Review Error:",
+                    error
+                );
+
+
+                // API fail hone par checkbox revert
+                checkbox.checked =
+                    !checkbox.checked;
+
+
+                showDVRAlert(
+                    `Error: ${error.message}`,
+                    "red"
+                );
+
+            });
+
+    }
+
+
+    /* =========================================================
+       SAVE REVIEW
+    ========================================================= */
+
+    function saveReview(name) {
+
+        // const reviewedElement =
+        //     document.getElementById(`action_reviewed_${name}`);
+
+        const remarkElement =
+            document.getElementById(`remark_${name}`);
+
+        // console.log(remarkElement, reviewedElement)
+
+
+        if (!remarkElement) {
+
+            showDVRAlert(
+                "Review fields not found",
+                "red"
+            );
+            return;
+        }
+
+
+        // const reviewed =
+        //     reviewedElement.checked;
+
+        const remark =
+            remarkElement.value.trim();
+
+
+        fetch(
+            `/api/method/gke_crm.api.dvr.save_dvr_remarks?name=${encodeURIComponent(name)}&remarks=${encodeURIComponent(remark)}`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+        )
+            .then(response => {
+
+                return response.json().then(data => {
+
+                    if (!response.ok) {
+
+                        throw new Error(
+                            data.exception ||
+                            `HTTP Error: ${response.status}`
+                        );
+
+                    }
+
+                    return data;
+
+                });
+
+            })
+            .then(data => {
+
+                console.log(
+                    "Save Review API Response:",
+                    data
+                );
+
+
+                if (
+                    data.message &&
+                    data.message.success
+                ) {
+
+                    // Local data update
+                    const row =
+                        dvrData.find(
+                            item => item.name === name
+                        );
+
+
+                    if (row) {
+
+                        // row.reviewed =
+                        //     reviewed;
+
+                        row.manager_remarks =
+                            data.message.manager_remarks;
+
+                    }
+
+
+                    showDVRAlert(
+                        "Review saved successfully",
+                        "green"
+                    );
+
+
+                    // Dashboard refresh
+                    renderApprovalDashboard();
+
+                } else {
+
+                    showDVRAlert(
+                        "Failed to save review",
+                        "red"
+                    );
+
+                }
+
+            })
+            .catch(error => {
+
+                console.error(
+                    "Save Review Error:",
+                    error
+                );
+
+
+                showDVRAlert(
+                    `Error: ${error.message}`,
+                    "red"
+                );
+
+            });
+
+    }
+
+
+    /* =========================================================
+       VIEW PHOTO
+    ========================================================= */
+
+    function viewPhoto(name) {
+
+        frappe.msgprint(
+            `Photo preview for ${name}`
+        );
+
+    }
+
+
+    /* =========================================================
+       VIEW DVR
+    ========================================================= */
+
+    function viewDVR(name) {
+
+        frappe.set_route(
+            "Form",
+            "Daily Visit Report",
+            name
+        );
+
+    }
+
+
+    /* =========================================================
+       CLIENT DETAILS
+    ========================================================= */
+
+    function showClientDetails(client) {
+
+        const row =
+            dummyDVRData.find(
+                item =>
+                    item.client === client
+            );
+
+
+        const section =
+            document.getElementById(
+                "clientDetailSection"
+            );
+
+
+        const grid =
+            document.getElementById(
+                "clientDetailGrid"
+            );
+
+
+        if (!row) {
+
+            section.style.display =
+                "none";
+
+            return;
+
+        }
+
+
+        section.style.display =
+            "block";
+
+
+        grid.innerHTML = `
+
+        <div class="detail-item">
+
+            <div class="detail-label">
+                Client
+            </div>
+
+            <div class="detail-value">
+                ${escapeHtml(row.client)}
+            </div>
+
+        </div>
+
+
+        
+
+
+        <div class="detail-item">
+
+            <div class="detail-label">
+                Executive
+            </div>
+
+            <div class="detail-value">
+                ${escapeHtml(row.executive)}
+            </div>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <div class="detail-label">
+                Branch
+            </div>
+
+            <div class="detail-value">
+                ${escapeHtml(row.branch)}
+            </div>
+
+        </div>
+
+    `;
+
+    }
+
+
+    /* =========================================================
+       MISSED FOLLOW UPS
+    ========================================================= */
+
+    function renderMissedFollowUps() {
+        const tbody = document.getElementById("missedFollowUpTable");
+        const empty = document.getElementById("missedFollowUpEmpty");
+        const section = document.getElementById("missedFollowUpsSection");
+
+        if (!tbody) return;
+
+        const from = document.getElementById("missedFollowUpFrom").value;
+        const to = document.getElementById("missedFollowUpTo").value;
+
+        // Local today's date
+        const now = new Date();
+        const today =
+            now.getFullYear() + "-" +
+            String(now.getMonth() + 1).padStart(2, "0") + "-" +
+            String(now.getDate()).padStart(2, "0");
+
+        // Live DVR data
+        let data = [...dvrData];
+
+        // ONLY past visit dates
+        data = data.filter(row => {
+            if (!row.visit_date) return false;
+
+            const visitDate = String(row.visit_date).substring(0, 10);
+
+            return visitDate < today;
+        });
+
+        // Optional date filters
+        if (from) {
+            data = data.filter(row => {
+                const visitDate = String(row.visit_date).substring(0, 10);
+                return visitDate >= from;
+            });
+        }
+
+        if (to) {
+            data = data.filter(row => {
+                const visitDate = String(row.visit_date).substring(0, 10);
+                return visitDate <= to;
+            });
+        }
+
+        tbody.innerHTML = "";
+
+        if (!data.length) {
+            section.style.display = "block";
+            empty.style.display = "block";
+            return;
+        }
+
+        section.style.display = "block";
+        empty.style.display = "none";
+
+        data.forEach(row => {
+            const visitDate = String(row.visit_date).substring(0, 10);
+
+            const tr = document.createElement("tr");
+
+            tr.innerHTML = `
+            <td>${escapeHtml(visitDate)}</td>
+            <td>${escapeHtml(row.client || "-")}</td>
+            <td>${escapeHtml(row.client_type || "-")}</td>
+            <td>${escapeHtml(row.executive || "-")}</td>
+            <td>${escapeHtml(row.branch || "-")}</td>
+            <td>${escapeHtml(row.purpose_status || "-")}</td>
+            <td>${getStatusBadge(row.approval_status)}</td>
+        `;
+
+            tbody.appendChild(tr);
+        });
+    }
+
+
+    /* =========================================================
+       CLEAR MISSED FOLLOW UP FILTERS
+    ========================================================= */
+
+    function clearMissedFollowUpFilters() {
+
+        document.getElementById(
+            "missedFollowUpFrom"
+        ).value = "";
+
+
+        document.getElementById(
+            "missedFollowUpTo"
+        ).value = "";
+
+
+        renderMissedFollowUps();
+
+    }
+
+
+    /* =========================================================
+       CLEAR APPROVAL FILTERS
+    ========================================================= */
+
+    function clearApprovalFilters() {
+
+        document.getElementById(
+            "approvalClientType"
+        ).value = "";
+
+
+        document.getElementById(
+            "approvalFrom"
+        ).value = "";
+
+
+        document.getElementById(
+            "approvalTo"
+        ).value = "";
+
+
+        populateClientFilter();
+
+
+        document.getElementById(
+            "approvalClientFilter"
+        ).value = "";
+
+
+        renderApprovalDashboard();
+
+    }
+
+
+    /* =========================================================
+       ESCAPE HTML
+    ========================================================= */
+
+    function escapeHtml(value) {
+
+        if (
+            value === null ||
+            value === undefined
+        ) {
+            return "";
+        }
+
+
+        return String(value)
+
+            .replace(
+                /&/g,
+                "&amp;"
+            )
+
+            .replace(
+                /</g,
+                "&lt;"
+            )
+
+            .replace(
+                />/g,
+                "&gt;"
+            )
+
+            .replace(
+                /"/g,
+                "&quot;"
+            )
+
+            .replace(
+                /'/g,
+                "&#039;"
+            );
+
+    }
+
+</script>

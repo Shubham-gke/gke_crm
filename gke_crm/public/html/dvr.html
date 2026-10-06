@@ -1,0 +1,23 @@
+<div class="dashboard-tabs">
+
+  <div class="tab-buttons">
+    <button class="tab-btn active" onclick="openTab('visit-report', this)">
+      Daily Visit Report
+    </button>
+
+    <button class="tab-btn" onclick="openTab('follow-up', this)">
+      Follow Up Report
+    </button>
+  </div>
+
+  <div id="visit-report" class="tab-content active">
+    <iframe src="/assets/crm/sales_visit_report_administrator.html" class="report-frame">
+    </iframe>
+  </div>
+
+  <div id="follow-up" class="tab-content">
+    <iframe src="/assets/crm/administrator.html" class="report-frame">
+    </iframe>
+  </div>
+
+</div>
