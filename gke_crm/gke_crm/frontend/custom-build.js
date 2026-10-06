@@ -351,34 +351,8 @@ const ORIGINAL_CRM_DIR = path.join(
   "crm"
 )
 
-if (
-  fs.existsSync(STAGED_CRM_DIR) ||
-  fs.lstatSync(
-    path.dirname(STAGED_CRM_DIR)
-  ).isSymbolicLink?.()
-) {
-  try {
-    fs.rmSync(
-      STAGED_CRM_DIR,
-      {
-        recursive: true,
-        force: true,
-      }
-    )
-  } catch (error) {
-    console.log(
-      "   Existing staged CRM path could not be removed."
-    )
-  }
-}
-
-if (!fs.existsSync(STAGED_CRM_DIR)) {
-  fs.symlinkSync(
-    ORIGINAL_CRM_DIR,
-    STAGED_CRM_DIR,
-    "dir"
-  )
-}
+fs.rmSync(STAGED_CRM_DIR, { recursive: true, force: true })
+fs.symlinkSync(ORIGINAL_CRM_DIR, STAGED_CRM_DIR, "dir")
 
 console.log(
   "   CRM directory linked."
