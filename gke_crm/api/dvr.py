@@ -18,7 +18,7 @@ def get_dvr_for_approval(
 
     # Get Employee data from API
     response = requests.get(
-        "http://ec2-13-234-27-130.ap-south-1.compute.amazonaws.com:8002/api/method/get_employee_from_gk",
+        "https://gkexport-crm.m.frappe.cloud/api/method/get_employee_from_gk",
         timeout=10
     )
 
@@ -124,7 +124,7 @@ def get_dvr_for_approval_new_client(
 
     # Get Employee data from API
     response = requests.get(
-        "http://ec2-13-234-27-130.ap-south-1.compute.amazonaws.com:8002/api/method/get_employee_from_gk",
+        "https://gkexport-crm.m.frappe.cloud/api/method/get_employee_from_gk",
         timeout=10
     )
 

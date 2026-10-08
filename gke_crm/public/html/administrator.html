@@ -1509,36 +1509,36 @@
             console.log("Logged-in User:", loggedInUser);
 
             // Sirf Administrator allowed
-            // if (loggedInUser !== "Administrator") {
-            //     document.body.innerHTML = `
-            //     <div style="
-            //         height: 100vh;
-            //         display: flex;
-            //         align-items: center;
-            //         justify-content: center;
-            //         font-family: Arial, sans-serif;
-            //         background: #f8f9fa;
-            //     ">
-            //         <div style="
-            //             text-align: center;
-            //             padding: 40px;
-            //             background: white;
-            //             border-radius: 12px;
-            //             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            //         ">
-            //             <h2 style="color: #dc3545; margin-bottom: 10px;">
-            //                 Access Denied
-            //             </h2>
+            if (loggedInUser !== "Administrator") {
+                document.body.innerHTML = `
+                <div style="
+                    height: 100vh;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-family: Arial, sans-serif;
+                    background: #f8f9fa;
+                ">
+                    <div style="
+                        text-align: center;
+                        padding: 40px;
+                        background: white;
+                        border-radius: 12px;
+                        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+                    ">
+                        <h2 style="color: #dc3545; margin-bottom: 10px;">
+                            Access Denied
+                        </h2>
 
-            //             <p style="color: #666; margin: 0;">
-            //                 Cannot be accessed by this user.
-            //             </p>
-            //         </div>
-            //     </div>
-            // `;
+                        <p style="color: #666; margin: 0;">
+                            Cannot be accessed by this user.
+                        </p>
+                    </div>
+                </div>
+            `;
 
-            //     return;
-            // }
+                return;
+            }
 
             // Allowed user
             document.getElementById("approvalPage").style.display = "block";
