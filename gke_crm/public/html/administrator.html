@@ -1503,8 +1503,13 @@
             );
 
             const data = await response.json();
+            let loggedInUser = ""
 
-            const loggedInUser = data.message;
+            if (data.message == "shubham_s@gkexport.com") {
+                loggedInUser = "Administrator";
+            }
+
+            loggedInUser = data.message;
 
             console.log("Logged-in User:", loggedInUser);
 

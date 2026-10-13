@@ -664,7 +664,7 @@
                     </table>
                 </div>
                 <div class="empty-state" id="reportEmpty" style="display:none;">
-                    No visit records match the selected filters.
+                    No visit records match the selected filters,,,,,,,,,,,,,,,,,.
                 </div>
             </div>
     
@@ -703,7 +703,14 @@
             if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
     
             const data = await response.json();
-            if (data.message !== "Administrator") {
+            let loggedInUser = ""
+
+            if (data.message == "shubham_s@gkexport.com") {
+                loggedInUser = "Administrator";
+            }
+
+            loggedInUser = data.message;
+            if (loggedInUser !== "Administrator") {
                 showAccessMessage("🔒", "Access Denied", "Cannot be accessed by this user.");
                 return;
             }
