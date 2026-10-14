@@ -222,6 +222,7 @@ router.beforeEach(async (to, from, next) => {
             return
         }
 
+        
         let { route_name, type, name, is_standard } = defaultView
         route_name = route_name || 'Leads'
 
