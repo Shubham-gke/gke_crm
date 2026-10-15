@@ -92,10 +92,22 @@ try {
 
   console.log("2. Applying custom pages...")
   const customPages = path.join(CUSTOM_FRONTEND, "src/pages")
+  const overridePages = path.join(CUSTOM_FRONTEND, "src_override/pages")
+
+  // Copy custom pages from src/pages
   if (fs.existsSync(customPages)) {
     for (const file of fs.readdirSync(customPages)) {
       if (file.endsWith(".vue")) {
         copyOverride(`src/pages/${file}`, `src/pages/${file}`)
+      }
+    }
+  }
+
+  // Copy overridden pages from src_override/pages
+  if (fs.existsSync(overridePages)) {
+    for (const file of fs.readdirSync(overridePages)) {
+      if (file.endsWith(".vue")) {
+        copyOverride(`src_override/pages/${file}`, `src/pages/${file}`)
       }
     }
   }
