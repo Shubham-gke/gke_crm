@@ -93,7 +93,10 @@ try {
   console.log("2. Applying custom pages...")
   const customPages = path.join(CUSTOM_FRONTEND, "src/pages")
   const overridePages = path.join(CUSTOM_FRONTEND, "src_override/pages")
-
+  const overrideComponents = path.join(
+    CUSTOM_FRONTEND,
+    "src_override/components"
+  )
   // Copy custom pages from src/pages
   if (fs.existsSync(customPages)) {
     for (const file of fs.readdirSync(customPages)) {
@@ -111,6 +114,15 @@ try {
       }
     }
   }
+
+  // Copy overridden components recursively
+if (fs.existsSync(overrideComponents)) {
+  copyRecursive(
+    overrideComponents,
+    path.join(BUILD_DIR, "src/components")
+  )
+  console.log("   + Override components copied")
+}
 
   console.log("3. Applying router and sidebar overrides...")
   copyOverride("src_override/router.js", "src/router.js")
