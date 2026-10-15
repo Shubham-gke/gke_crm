@@ -116,6 +116,8 @@ try {
   }
 
   // Copy overridden components recursively
+// Copy overridden components recursively.
+// Merge into standard CRM components; do not delete existing components.
 if (fs.existsSync(overrideComponents)) {
   copyRecursive(
     overrideComponents,
