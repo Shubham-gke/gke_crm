@@ -242,22 +242,39 @@ const links = [
 
 const isAdministrator = ref(false)
 
+
 async function checkAdministrator() {
     try {
         const response = await fetch(
             '/api/method/frappe.auth.get_logged_user'
-        )
+        );
 
-        const data = await response.json()
+        const data = await response.json();
 
-        console.log('Logged-in User:', data.message)
+        const loggedInUser = data.message;
 
-        isAdministrator.value = data.message === 'Administrator'
+        console.log('Logged-in User:', loggedInUser);
+
+        const adminUsers = [
+            'shubham_s@gkexport.com',
+            'shubham_si@gkexport.com',
+            'jignesh_v@gkexport.com',
+            'cdr@gkexport.com',
+            'abhishek_s@gkexport.com'
+        ];
+
+        isAdministrator.value =
+            loggedInUser === 'Administrator' ||
+            adminUsers.includes(loggedInUser);
+
+        console.log('Is Administrator:', isAdministrator.value);
+
     } catch (error) {
-        console.error('User check failed:', error)
-        isAdministrator.value = false
+        console.error('User check failed:', error);
+        isAdministrator.value = false;
     }
 }
+
 
 const allViews = computed(() => {
     let _views = [

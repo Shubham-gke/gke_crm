@@ -703,13 +703,14 @@
             if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
     
             const data = await response.json();
-            let loggedInUser = ""
+            
+            let loggedInUser = data.message;
 
-            if (data.message == "shubham_s@gkexport.com") {
+            if (data.message == "shubham_s@gkexport.com" || "shubham_si@gkexport.com" || "jignesh_v@gkexport.com" || "cdr@gkexport.com" || "abhishek_s@gkexport.com") {
                 loggedInUser = "Administrator";
             }
 
-            loggedInUser = data.message;
+            // loggedInUser = data.message;
             if (loggedInUser !== "Administrator") {
                 showAccessMessage("🔒", "Access Denied", "Cannot be accessed by this user.");
                 return;

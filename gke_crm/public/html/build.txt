@@ -1,0 +1,3 @@
+node apps/gke_crm/gke_crm/gke_crm/frontend/custom-build.js 2>&1 | tee /tmp/gke-crm-build.log
+
+(use this command if updated ui not reflect in live site)
