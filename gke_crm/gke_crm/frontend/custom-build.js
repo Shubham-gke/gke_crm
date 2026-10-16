@@ -93,11 +93,11 @@ try {
 
   console.log("2. Applying custom pages...")
   const customPages = path.join(CUSTOM_FRONTEND, "src/pages")
-  // const overridePages = path.join(CUSTOM_FRONTEND, "src_override/pages")
-  // const overrideComponents = path.join(
-  //   CUSTOM_FRONTEND,
-  //   "src_override/components"
-  // )
+  const overridePages = path.join(CUSTOM_FRONTEND, "src_override/pages")
+  const overrideComponents = path.join(
+    CUSTOM_FRONTEND,
+    "src_override/components"
+  )
   // Copy custom pages from src/pages
   if (fs.existsSync(customPages)) {
     for (const file of fs.readdirSync(customPages)) {
@@ -108,31 +108,31 @@ try {
   }
 
   // Copy overridden pages from src_override/pages
-  // if (fs.existsSync(overridePages)) {
-  //   for (const file of fs.readdirSync(overridePages)) {
-  //     if (file.endsWith(".vue")) {
-  //       copyOverride(`src_override/pages/${file}`, `src/pages/${file}`)
-  //     }
-  //   }
-  // }
+  if (fs.existsSync(overridePages)) {
+    for (const file of fs.readdirSync(overridePages)) {
+      if (file.endsWith(".vue")) {
+        copyOverride(`src_override/pages/${file}`, `src/pages/${file}`)
+      }
+    }
+  }
 
-  // Copy overridden components recursively
+//Copy overridden components recursively
 // Copy overridden components recursively.
 // Merge into standard CRM components; do not delete existing components.
-// if (fs.existsSync(overrideComponents)) {
-//   copyRecursive(
-//     overrideComponents,
-//     path.join(BUILD_DIR, "src/components")
-//   )
-//   console.log("   + Override components copied")
-// }
+if (fs.existsSync(overrideComponents)) {
+  copyRecursive(
+    overrideComponents,
+    path.join(BUILD_DIR, "src/components")
+  )
+  console.log("   + Override components copied")
+}
 
-//   console.log("3. Applying router and sidebar overrides...")
-//   copyOverride("src_override/router.js", "src/router.js")
-//   copyOverride(
-//     "src_override/components/Layouts/AppSidebar.vue",
-//     "src/components/Layouts/AppSidebar.vue"
-//   )
+  console.log("3. Applying router and sidebar overrides...")
+  copyOverride("src_override/router.js", "src/router.js")
+  copyOverride(
+    "src_override/components/Layouts/AppSidebar.vue",
+    "src/components/Layouts/AppSidebar.vue"
+  )
 
   console.log("4. Preparing node_modules...")
   const crmNodeModules = path.join(CRM_FRONTEND, "node_modules")
