@@ -3,3 +3,6 @@ node apps/gke_crm/gke_crm/gke_crm/frontend/custom-build.js 2>&1 | tee /tmp/gke-c
 
 node custom-build.js 2>&1 | tee /tmp/gke-crm-build.log
 (use this for new build for aour gke_custom app)
+
+
+node apps/gke_crm/gke_crm/gke_crm/frontend/custom-build.js 2>&1 | tee /tmp/gke-crm-custom-build.log
