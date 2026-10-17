@@ -384,6 +384,7 @@ def save_dvr_remarks(name: str, remarks: str | None = None):
         "access.txt"
     )
 
+
     try:
         with open(file_path, "r") as f:
             allowed_users.extend(
@@ -397,7 +398,7 @@ def save_dvr_remarks(name: str, remarks: str | None = None):
     except Exception as e:
         frappe.throw(f"File read error: {str(e)}")
     
-    if user in allowed_users:
+    if user not in allowed_users:
         frappe.throw("Permission Denied")
 
     if not name:
