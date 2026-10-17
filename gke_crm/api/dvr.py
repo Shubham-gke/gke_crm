@@ -36,19 +36,41 @@ def get_dvr_for_approval(
         ),
         None
     )
+
+    import os
+
+    allowed_users = ["Administrator"]
+
+    file_path = os.path.join(
+        os.path.dirname(__file__),
+        "access.txt"
+    )
+
+    try:
+        with open(file_path, "r") as f:
+            allowed_users.extend(
+                line.strip()
+                for line in f
+                if line.strip()
+            )
+
+        # frappe.throw(f"Allowed Users: {allowed_users}")
+
+    except Exception as e:
+        frappe.throw(f"File read error: {str(e)}")
     
     # frappe.throw(f"{employee}")
 
-    if not employee and user !="Administrator":
+    if not employee and user not in allowed_users:
         frappe.throw(
             f"No Employee found for logged-in user: {user}"
         )
 
-    employee_name = "Administrator" if user == "Administrator" else employee.get("user_id")
+    # employee_name = "Administrator" if user == "Administrator" else employee.get("user_id")
 
     # Base filter - only logged-in employee's visits
     
-    if user == "Administrator":
+    if user in allowed_users:
         filters = {}
     else:
         filters = {
@@ -145,21 +167,45 @@ def get_dvr_for_approval_new_client(
     
     # frappe.throw(f"{employee}")
 
-    if not employee and user !="Administrator":
+    import os
+
+    allowed_users = ["Administrator"]
+
+    file_path = os.path.join(
+        os.path.dirname(__file__),
+        "access.txt"
+    )
+
+    try:
+        with open(file_path, "r") as f:
+            allowed_users.extend(
+                line.strip()
+                for line in f
+                if line.strip()
+            )
+
+        # frappe.throw(f"Allowed Users: {allowed_users}")
+
+    except Exception as e:
+        frappe.throw(f"File read error: {str(e)}")
+
+    if not employee and user not in allowed_users:
         frappe.throw(
             f"No Employee found for logged-in user: {user}"
         )
 
-    employee_name = "Administrator" if user == "Administrator" else employee.get("user_id")
+    # employee_name = "Administrator" if user == "Administrator" else employee.get("user_id")
 
     # Base filter - only logged-in employee's visits
     
-    if user == "Administrator":
+    if user in allowed_users:
         filters = {}
     else:
         filters = {
             "sales_person": employee.get("user_id")
         }
+
+    # frappe.throw(f"{allowed_users}")
 
     # Client Type
     
@@ -277,8 +323,30 @@ def get_dvr_for_approval_new_client(
 def update_dvr_status(name: str, status: str):
     
     user = frappe.session.user
+
+    import os
+
+    allowed_users = ["Administrator"]
+
+    file_path = os.path.join(
+        os.path.dirname(__file__),
+        "access.txt"
+    )
+
+    try:
+        with open(file_path, "r") as f:
+            allowed_users.extend(
+                line.strip()
+                for line in f
+                if line.strip()
+            )
+
+        # frappe.throw(f"Allowed Users: {allowed_users}")
+
+    except Exception as e:
+        frappe.throw(f"File read error: {str(e)}")
     
-    if user != "Administrator":
+    if user not in allowed_users:
         frappe.throw("Permission Denied")
         
     if not name:
@@ -306,8 +374,30 @@ def update_dvr_status(name: str, status: str):
 def save_dvr_remarks(name: str, remarks: str | None = None):
     
     user = frappe.session.user
+
+    import os
+
+    allowed_users = ["Administrator"]
+
+    file_path = os.path.join(
+        os.path.dirname(__file__),
+        "access.txt"
+    )
+
+    try:
+        with open(file_path, "r") as f:
+            allowed_users.extend(
+                line.strip()
+                for line in f
+                if line.strip()
+            )
+
+        # frappe.throw(f"Allowed Users: {allowed_users}")
+
+    except Exception as e:
+        frappe.throw(f"File read error: {str(e)}")
     
-    if user != "Administrator":
+    if user in allowed_users:
         frappe.throw("Permission Denied")
 
     if not name:
@@ -332,8 +422,31 @@ def save_dvr_remarks(name: str, remarks: str | None = None):
 def save_dvr_review(name: str, reviewed: int = 0):
     
     user = frappe.session.user
+
+    import os
+
+    allowed_users = ["Administrator"]
+
+    file_path = os.path.join(
+        os.path.dirname(__file__),
+        "access.txt"
+    )
+
+    try:
+        with open(file_path, "r") as f:
+            allowed_users.extend(
+                line.strip()
+                for line in f
+                if line.strip()
+            )
+
+        # frappe.throw(f"Allowed Users: {allowed_users}")
+
+    except Exception as e:
+        frappe.throw(f"File read error: {str(e)}")
+
     
-    if user != "Administrator":
+    if user not in allowed_users:
         frappe.throw("Permission Denied")
 
     if not name:
