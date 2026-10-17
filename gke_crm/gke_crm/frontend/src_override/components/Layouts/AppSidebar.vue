@@ -230,12 +230,12 @@ const links = [
     {
         label: 'Customer Management',
         icon: OrganizationsIcon,
-        to: 'Customer Management',
+        to: 'CustomerManagement',
     },
     {
         label: 'Administrator Management',
         icon: OrganizationsIcon,
-        to: 'Administrator Management',
+        to: 'AdministratorManagement',
         condition: () => isAdministrator.value,
     },
 ]
@@ -369,6 +369,7 @@ function currentRouteKey() {
 // move the highlight here.
 const activeItem = ref(currentRouteKey())
 
+
 function selectItem(event, key) {
     if (
         event.metaKey ||
@@ -379,13 +380,18 @@ function selectItem(event, key) {
     ) {
         return
     }
+
     activeItem.value = key
-    // Selecting the row for the route already open leaves the URL unchanged, so
-    // the drawer's navigation watcher never fires. Close it here too.
+
+    router.push({ name: key }).catch((error) => {
+        console.error('Navigation failed:', key, error)
+    })
+
     if (props.mobile) {
         mobileSidebarOpened.value = false
     }
 }
+
 
 watch(
     () => [route.name, route.query.view],
