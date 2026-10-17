@@ -49,10 +49,10 @@ def get_dvr_for_approval(
     try:
         with open(file_path, "r") as f:
             allowed_users.extend(
-                line.strip()
+                line.strip().rstrip(",")
                 for line in f
-                if line.strip()
-            )
+                if line.strip().rstrip(",")
+        )
 
         # frappe.throw(f"Allowed Users: {allowed_users}")
 
@@ -179,10 +179,10 @@ def get_dvr_for_approval_new_client(
     try:
         with open(file_path, "r") as f:
             allowed_users.extend(
-                line.strip()
+                line.strip().rstrip(",")
                 for line in f
-                if line.strip()
-            )
+                if line.strip().rstrip(",")
+        )
 
         # frappe.throw(f"Allowed Users: {allowed_users}")
 
@@ -335,11 +335,12 @@ def update_dvr_status(name: str, status: str):
 
     try:
         with open(file_path, "r") as f:
+
             allowed_users.extend(
-                line.strip()
+                line.strip().rstrip(",")
                 for line in f
-                if line.strip()
-            )
+                if line.strip().rstrip(",")
+        )
 
         # frappe.throw(f"Allowed Users: {allowed_users}")
 
@@ -388,10 +389,10 @@ def save_dvr_remarks(name: str, remarks: str | None = None):
     try:
         with open(file_path, "r") as f:
             allowed_users.extend(
-                line.strip()
+                line.strip().rstrip(",")
                 for line in f
-                if line.strip()
-            )
+                if line.strip().rstrip(",")
+        )
 
         # frappe.throw(f"Allowed Users: {allowed_users}")
 
@@ -436,10 +437,10 @@ def save_dvr_review(name: str, reviewed: int = 0):
     try:
         with open(file_path, "r") as f:
             allowed_users.extend(
-                line.strip()
+                line.strip().rstrip(",")
                 for line in f
-                if line.strip()
-            )
+                if line.strip().rstrip(",")
+        )
 
         # frappe.throw(f"Allowed Users: {allowed_users}")
 
