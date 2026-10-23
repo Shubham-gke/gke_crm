@@ -165,24 +165,28 @@
   {
    "fieldname": "party_name",
    "fieldtype": "Data",
-   "label": "Party Name"
+   "label": "Party Name",
+   "reqd": 1
   },
   {
    "fieldname": "person_name",
    "fieldtype": "Data",
-   "label": "Person Name"
+   "label": "Person Name",
+   "reqd": 1
   },
   {
    "fieldname": "lead_mobile",
    "fieldtype": "Data",
    "label": "Mobile Number",
-   "options": "Phone"
+   "options": "Phone",
+   "reqd": 1
   },
   {
    "fieldname": "lead_email",
    "fieldtype": "Data",
    "label": "Email Address",
-   "options": "Email"
+   "options": "Email",
+   "reqd": 1
   },
   {
    "fieldname": "col_new_client_1",

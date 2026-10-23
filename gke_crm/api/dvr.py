@@ -114,6 +114,7 @@ def get_dvr_for_approval(
             "client_type",
             "visit_type",
             "party_name",
+            "expected_order",
             "sales_executive_name",
             "purpose",
             "visit_photo",
