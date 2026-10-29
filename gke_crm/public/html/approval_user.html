@@ -1686,11 +1686,15 @@
                 subLead
             );
 
+            if (dvr.client_type == "New Client" && dvr.approval_status == "Approved") {
+                window.location.href =
+                    "/app/sub-lead/" + encodeURIComponent(subLead.name);
+            } else {
+                alert("Not allowed to proceed to the next process. Please approve the lead first.");
+            }
 
-            // 5. Open NEW Sub Lead
-            window.location.href =
-                "/app/sub-lead/" +
-                encodeURIComponent(subLead.name);
+            // window.location.href =
+            //         "/app/sub-lead/" + encodeURIComponent(subLead.name);
 
         }
         catch (error) {
