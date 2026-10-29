@@ -447,20 +447,27 @@
                 <td>${esc(row.branch || "-")}</td>
                 <td>${esc(row.priority || "-")}</td>
                 <td>${esc(note)}</td>
+             
                 <td>${row.approval_status ? `<span class="badge ${statusClass}">${esc(row.approval_status)}</span>` : "-"}</td>
-                <td><span class="link-action" onclick="openDVR('${esc(row.name)}', '${esc(row.client_type || "")}')">Click To follow-up →</span></td>
+
+                <td>
+                    <span class="link-action" onclick="openDVR('${esc(row.name)}', '${esc(row.client_type || "")}', '${esc(row.approval_status || "")}')">
+                        Click To follow-up →
+                    </span>
+                </td>
+
             `;
             tbody.appendChild(tr);
         });
     }
     
-    function openDVR(name, clientType) {
+    function openDVR(name, clientType, approval_status) {
         if (!name) return;
     
-        if (clientType === "New Client") {
+        if (clientType === "New Client" && approval_status == "Approved") {
             window.location.href = `/app/sub-lead/new`;
         } else {
-            window.location.href = `/app/daily-visit-report/new`;
+            alert("Not allowed to proceed to the next process. Please approve the lead first.");
         }
     }
     
