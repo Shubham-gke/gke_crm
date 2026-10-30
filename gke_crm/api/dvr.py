@@ -205,6 +205,7 @@ def get_dvr_for_approval_new_client(
         filters = {
             "sales_person": employee.get("user_id")
         }
+    # frappe.throw(f"{filters}")
 
     # frappe.throw(f"{allowed_users}")
 
@@ -777,3 +778,33 @@ def get_visit_types():
     )
 
     return [d.name for d in records]
+
+
+
+@frappe.whitelist()
+def get_crm_user():
+
+    roles = frappe.get_roles()
+
+    if (
+        frappe.session.user != "Administrator"
+        and "System Manager" not in roles
+    ):
+        frappe.throw("Not permitted", frappe.PermissionError)
+
+    url = "https://gkexport-crm.m.frappe.cloud/api/method/get_user"
+
+    try:
+        response = requests.get(url, timeout=20)
+        response.raise_for_status()
+
+        data = response.json()
+
+        return data.get("message", [])
+
+    except Exception:
+        frappe.log_error(
+            frappe.get_traceback(),
+            "CRM Employee API Error"
+        )
+        frappe.throw("Unable to fetch employees from CRM")

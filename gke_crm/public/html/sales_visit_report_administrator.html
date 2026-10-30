@@ -1,3 +1,7 @@
+
+<!-- sales_visir_report_admi_get_user_from_gk ye old wala pura code any issue use it replace whole code with this file -->
+
+
 <style>
     * {
         margin: 0;
@@ -563,12 +567,21 @@
         <div class="filter-bar">
             <div class="fitem" id="employeeFilterWrap">
                 <label for="employeeSearchInput">Sales Executive</label>
+            
                 <div class="searchable-select" id="employeeSearchableSelect">
-                    <input type="text" id="employeeSearchInput" class="search-select-input"
-                        placeholder="All Sales Executive" autocomplete="off"
-                        onfocus="openEmployeeDropdown()" oninput="filterEmployeeOptions()">
+                    <input
+                        type="text"
+                        id="employeeSearchInput"
+                        class="search-select-input"
+                        placeholder="All Sales Executive"
+                        autocomplete="off"
+                        onfocus="openEmployeeDropdown()"
+                        oninput="filterEmployeeOptions()"
+                    >
+            
                     <div class="search-select-dropdown" id="employeeDropdownList"></div>
                 </div>
+            
                 <select id="employeeFilter" style="display:none;">
                     <option value="">All Sales Executive</option>
                 </select>
@@ -875,27 +888,114 @@ document.addEventListener("click", function (e) {
     }
 });
 
+// let employeeOptionsCache = [];
+
 function loadSalesExecutive() {
-    fetch("/api/method/get_employee_from_gk", {
-        method: "GET", headers: { "Content-Type": "application/json" }, credentials: "same-origin"
+    fetch("/api/method/gke_crm.api.dvr.get_crm_user", {
+        method: "GET",
+        headers: {
+            "Accept": "application/json"
+        },
+        credentials: "same-origin"
     })
-        .then(r => { if (!r.ok) throw new Error("Failed to load sales executives"); return r.json(); })
-        .then(data => {
-            const select = document.getElementById("employeeFilter");
-            if (!select) return;
-            select.innerHTML = `<option value="">All Sales Executive</option>`;
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Failed to load Sales Executives");
+        }
+        return response.json();
+    })
+    .then(response => {
+        const select = document.getElementById("employeeFilter");
+        if (!select) return;
 
-            const employees = data.message || [];
-            employees.forEach(item => {
-                const option = document.createElement("option");
-                option.value = item.name;
-                option.textContent = item.employee_name || item.name;
-                select.appendChild(option);
-            });
+        select.innerHTML = `<option value="">All Sales Executive</option>`;
 
-            buildEmployeeDropdown(employees);
-        })
-        .catch(e => console.error("Sales Executive API Error:", e));
+        // Correct API response path
+        const employees = Array.isArray(response.message?.data)
+            ? response.message.data
+            : [];
+
+        employees.forEach(item => {
+            const option = document.createElement("option");
+            option.value = item.name;
+            option.textContent = item.full_name || item.name;
+            select.appendChild(option);
+        });
+
+        buildEmployeeDropdown(employees);
+
+        console.log("Total Sales Executives:", employees.length);
+    })
+    .catch(error => {
+        console.error("Sales Executive API Error:", error);
+    });
+}
+
+function buildEmployeeDropdown(employees) {
+    employeeOptionsCache = [
+        { name: "", full_name: "All Sales Executive" },
+        ...employees
+    ];
+
+    renderEmployeeDropdownList(employeeOptionsCache);
+}
+
+function renderEmployeeDropdownList(list) {
+    const dropdown = document.getElementById("employeeDropdownList");
+    if (!dropdown) return;
+
+    dropdown.innerHTML = "";
+
+    if (!list.length) {
+        dropdown.innerHTML = `
+            <div class="search-select-option no-match">
+                No matching executive
+            </div>
+        `;
+        return;
+    }
+
+    list.forEach(item => {
+        const label = item.full_name || item.name || "All Sales Executive";
+        const option = document.createElement("div");
+
+        option.className = "search-select-option";
+        option.textContent = label;
+
+        option.onclick = () => selectEmployee(item.name, label);
+
+        dropdown.appendChild(option);
+    });
+}
+
+function openEmployeeDropdown() {
+    document.getElementById("employeeDropdownList")
+        ?.classList.add("open");
+}
+
+function filterEmployeeOptions() {
+    const query = document.getElementById("employeeSearchInput")
+        ?.value.trim().toLowerCase() || "";
+
+    const filtered = employeeOptionsCache.filter(item =>
+        (item.full_name || item.name || "").toLowerCase().includes(query)
+    );
+
+    renderEmployeeDropdownList(filtered);
+    openEmployeeDropdown();
+}
+
+function selectEmployee(value, label) {
+    const select = document.getElementById("employeeFilter");
+    const input = document.getElementById("employeeSearchInput");
+
+    if (select) select.value = value;
+    if (input) input.value = value ? label : "";
+
+    document.getElementById("employeeDropdownList")
+        ?.classList.remove("open");
+
+    renderReport();
 }
 
 /* ---------- CLIENT NAME FILTER ---------- */

@@ -166,27 +166,27 @@
    "fieldname": "party_name",
    "fieldtype": "Data",
    "label": "Party Name",
-   "reqd": 1
+    "mandatory_depends_on": "eval:doc.client_type !== 'Existing Client'"
   },
   {
    "fieldname": "person_name",
    "fieldtype": "Data",
    "label": "Person Name",
-   "reqd": 1
+    "mandatory_depends_on": "eval:doc.client_type !== 'Existing Client'"
   },
   {
    "fieldname": "lead_mobile",
    "fieldtype": "Data",
    "label": "Mobile Number",
    "options": "Phone",
-   "reqd": 1
+    "mandatory_depends_on": "eval:doc.client_type !== 'Existing Client'"
   },
   {
    "fieldname": "lead_email",
    "fieldtype": "Data",
    "label": "Email Address",
    "options": "Email",
-   "reqd": 1
+   "mandatory_depends_on": "eval:doc.client_type !== 'Existing Client'"
   },
   {
    "fieldname": "col_new_client_1",
