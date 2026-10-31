@@ -466,11 +466,16 @@
         if (!name) return;
     
         if (clientType === "New Client" && approval_status == "Approved") {
-            window.location.href = `/app/sub-lead/new`;
+            
+            const url = `/app/sub-lead/new?parent_lead_id=${encodeURIComponent(name)}`;
+
+            window.location.href = url;
+            // window.location.href = `/app/sub-lead/new`;
         } else {
             alert("Not allowed to proceed to the next process. Please approve the lead first.");
         }
     }
+    
     
     /* ---------- init (runs once) ---------- */
     document.addEventListener("DOMContentLoaded", function () {

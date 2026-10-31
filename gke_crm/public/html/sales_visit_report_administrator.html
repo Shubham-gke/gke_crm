@@ -1166,8 +1166,21 @@ function renderFollowUpReport(data = dvrData) {
             <td>${row.priority || "-"}</td>
             <td>${note}</td>
             <td>${row.approval_status ? `<span class="badge ${statusClass}">${row.approval_status}</span>` : "-"}</td>
-            <td><span class="link-action" onclick="openDVR('${row.name}', '${row.client_type || ""}')">Click To follow-up →</span></td>
+            <td>
+                <span class="link-action followup-link">
+                    Click To follow-up →
+                </span>
+            </td>
         `;
+        const followupLink = tr.querySelector(".followup-link");
+
+        followupLink.addEventListener("click", function () {
+            openDVR(
+                row.name,
+                row.client_type || "",
+                row.approval_status || ""
+            );
+        });
         tbody.appendChild(tr);
     });
 }
@@ -1208,12 +1221,26 @@ function renderVisitRecords(data = dvrData) {
 }
 
 /* New Client -> Sub Lead, Existing Client -> Daily Visit Report */
-function openDVR(name, clientType) {
+// function openDVR(name, clientType, approval_status) {
+//     if (!name) return;
+//     if (clientType === "New Client") {
+//         window.location.href = `/app/sub-lead/new`;
+//     } else {
+//         window.location.href = `/app/daily-visit-report/new`;
+//     }
+// }
+
+function openDVR(name, clientType, approval_status) {
     if (!name) return;
-    if (clientType === "New Client") {
-        window.location.href = `/app/sub-lead/new`;
+
+    if (clientType === "New Client" && approval_status === "Approved") {
+
+        const url = `/app/sub-lead/new?parent_lead_id=${encodeURIComponent(name)}`;
+
+        window.location.href = url;
+
     } else {
-        window.location.href = `/app/daily-visit-report/new`;
+        alert("Not allowed to proceed to the next process. Please approve the lead first.");
     }
 }
 
